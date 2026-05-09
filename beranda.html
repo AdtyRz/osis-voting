@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calon Ketua OSIS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background-color:#f5f0e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;max-width:420px;margin:0 auto;position:relative;overflow-x:hidden}
+    .header{text-align:center;padding:35px 20px 20px;width:100%;position:relative}
+    .header-main{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+    .header-title{display:flex;flex-direction:column;align-items:center}
+    .header-title .label{font-weight:300;font-size:13px;color:#3a3a3a;letter-spacing:1px}
+    .header-title .title{font-family:'Playfair Display',serif;font-weight:900;font-size:48px;color:#1a1a2e;letter-spacing:3px;line-height:1}
+    .header-divider{width:2px;height:60px;background-color:#1a1a2e;opacity:.3}
+    .header-subtitle-area{display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .header-subtitle{font-weight:600;font-size:8px;color:#555;letter-spacing:2.5px;text-transform:uppercase;line-height:1.6;text-align:center}
+    .header-year{font-weight:400;font-size:11px;color:#3a3a3a;letter-spacing:2px;margin-top:15px}
+    .stamp-watermark{position:absolute;top:15px;right:20px;width:120px;height:90px;opacity:1;transform:rotate(-15deg);object-fit:contain;z-index:0}
+    .header-deco{width:100%;height:1px;background:linear-gradient(to right,transparent,#c4b89a,transparent);margin-top:10px}
+    .cards-container{width:100%;padding:0 15px;display:flex;flex-direction:column;gap:25px;margin-bottom:90px}
+
+    /* ── SUDAH MEMILIH BANNER ── */
+    .voted-banner{background:#1a1a2e;color:#fff;border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:4px}
+    .voted-banner .icon{font-size:22px}
+    .voted-banner .text{font-size:12px;line-height:1.5}
+    .voted-banner .text strong{display:block;font-size:14px}
+
+    /* ── LOADING ── */
+    .loading-cards{display:flex;flex-direction:column;gap:25px;width:100%}
+    .skel{background:#fffdf7;border-radius:15px;padding:20px;box-shadow:0 2px 15px rgba(0,0,0,.08)}
+    .skel-line{height:14px;background:linear-gradient(90deg,#e8e0d0 25%,#f0ead8 50%,#e8e0d0 75%);background-size:200% 100%;border-radius:6px;animation:shimmer 1.4s infinite;margin-bottom:10px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    .card{background:#fffdf7;border-radius:15px;padding:20px;position:relative;box-shadow:0 2px 15px rgba(0,0,0,.08),0 8px 30px rgba(0,0,0,.05)}
+    .card::before{content:'';position:absolute;top:-10px;left:0;right:0;height:20px;background-image:url('source/image/potong.png');background-repeat:repeat-x;background-size:auto 100%;z-index:2}
+    .card::after{content:'';position:absolute;top:2px;left:0;right:0;height:8px;background:linear-gradient(to bottom,rgba(0,0,0,.04),transparent);z-index:3}
+    .paslon-label{display:inline-block;background:#1a1a2e;color:#fff;font-weight:600;font-size:10px;letter-spacing:2px;padding:5px 14px;text-transform:uppercase}
+    .no-stamp{position:absolute;top:12px;right:15px;width:75px;height:30px;border:2px solid #c0392b;display:flex;align-items:center;justify-content:center;transform:rotate(12deg);color:#c0392b;font-weight:700;font-size:12px;letter-spacing:1px;opacity:.8;z-index:5}
+    .no-stamp::before{content:'';position:absolute;top:3px;left:3px;right:3px;bottom:3px;border:1px solid #c0392b;opacity:.5}
+    .card-content{display:flex;align-items:center;gap:18px}
+    .card-photo{flex-shrink:0;width:120px;height:120px;border-radius:12px;overflow:hidden;background:#e8e0d0}
+    .card-photo img{width:100%;height:100%;object-fit:cover}
+    .card-info{flex:1;display:flex;flex-direction:column;gap:6px}
+    .card-info .name{font-weight:600;font-size:15px;color:#1a1a2e;line-height:1.3}
+    .card-info .kelas{font-weight:500;font-size:12px;color:#555}
+    .card-info .quote{font-weight:400;font-size:11px;color:#888;font-style:italic;border-top:1px solid #ddd;padding-top:8px;margin-top:4px}
+    .btn-visi-misi{display:inline-flex;align-items:center;background:#1a1a2e;color:#fff;font-weight:500;font-size:12px;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;margin-top:10px;text-decoration:none;letter-spacing:.3px;width:fit-content;transition:all .3s ease;gap:8px}
+    .btn-visi-misi:hover{background:#2a2a4e;transform:translateY(-1px)}
+    .btn-visi-misi .arrow{font-size:14px;transition:transform .3s ease}
+    .btn-visi-misi.active .arrow{transform:rotate(180deg)}
+
+    /* ── TOMBOL PILIH (muncul di dalam card) ── */
+    .btn-pilih{display:inline-flex;align-items:center;gap:8px;background:#c0392b;color:#fff;font-weight:600;font-size:12px;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;margin-top:6px;letter-spacing:.3px;transition:all .3s;width:fit-content}
+    .btn-pilih:hover{background:#a93226;transform:translateY(-1px)}
+    .btn-pilih:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+    .visimisi-wrapper{overflow:hidden;max-height:0;transition:max-height .6s cubic-bezier(.4,0,.2,1)}
+    .visimisi-wrapper.open{max-height:1200px}
+    .visimisi-panel{background:#fffdf5;border-radius:15px;padding:25px 20px;position:relative;margin-top:-5px;box-shadow:0 2px 15px rgba(0,0,0,.08),0 8px 30px rgba(0,0,0,.05);clip-path:polygon(2% 0%,4% 2%,7% 0%,10% 1%,14% 0%,17% 2%,21% 0%,24% 1%,28% 0%,32% 2%,35% 0%,38% 1%,42% 0%,45% 2%,49% 0%,52% 1%,56% 0%,59% 2%,63% 0%,66% 1%,70% 0%,73% 2%,77% 0%,80% 1%,84% 0%,87% 2%,91% 0%,94% 1%,98% 0%,100% 2%,99% 5%,100% 8%,98% 11%,100% 15%,99% 18%,100% 22%,98% 25%,100% 28%,99% 32%,100% 35%,98% 38%,100% 42%,99% 45%,100% 48%,98% 52%,100% 55%,99% 58%,100% 62%,98% 65%,100% 68%,99% 72%,100% 75%,98% 78%,100% 82%,99% 85%,100% 88%,98% 92%,100% 95%,97% 98%,100% 100%,96% 99%,92% 100%,88% 98%,84% 100%,80% 99%,76% 100%,72% 98%,68% 100%,64% 99%,60% 100%,56% 98%,52% 100%,48% 99%,44% 100%,40% 98%,36% 100%,32% 99%,28% 100%,24% 98%,20% 100%,16% 99%,12% 100%,8% 98%,4% 100%,0% 97%,2% 92%,0% 88%,1% 84%,0% 80%,2% 76%,0% 72%,1% 68%,0% 64%,2% 60%,0% 56%,1% 52%,0% 48%,2% 44%,0% 40%,1% 36%,0% 32%,2% 28%,0% 24%,1% 20%,0% 16%,2% 12%,0% 8%,1% 4%)}
+    .tape{position:absolute;width:80px;height:25px;background:rgba(232,197,100,.5);z-index:10}
+    .tape-top-right{top:-12px;right:10px;transform:rotate(35deg)}
+    .tape-bottom-left{bottom:-12px;left:10px;transform:rotate(-35deg)}
+    .visi-section{margin-bottom:25px}
+    .section-header{display:flex;align-items:center;gap:10px;margin-bottom:15px}
+    .section-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .section-icon.visi-icon{background:#1a1a2e}
+    .section-icon.misi-icon{background:#c4b89a}
+    .section-icon svg{width:16px;height:16px}
+    .section-label{font-weight:700;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#1a1a2e}
+    .visi-text{font-size:13px;color:#333;line-height:1.8;padding-left:40px;text-align:justify}
+    .visi-divider{width:100%;height:1px;background:#ddd;margin:20px 0}
+    .misi-section{margin-bottom:10px}
+    .misi-list{list-style:none;padding-left:40px}
+    .misi-list li{position:relative;margin-bottom:15px;font-size:12px;color:#444;line-height:1.7}
+    .misi-number{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#1a1a2e;color:#fff;font-size:10px;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
+    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:#fff;display:flex;align-items:center;justify-content:space-around;padding:8px 10px 12px;box-shadow:0 -4px 20px rgba(0,0,0,.08);border-radius:20px 20px 0 0;z-index:100;height:70px}
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;text-decoration:none;color:#999;flex:1}
+    .nav-item.active{color:#1a1a2e}
+    .nav-item svg{width:24px;height:24px;fill:currentColor}
+    .nav-item .nav-label{font-size:9px;font-weight:500;letter-spacing:.5px}
+    .nav-item.scan{margin-top:-25px}
+    .scan-circle{width:58px;height:58px;background:#1a1a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(26,26,46,.3);position:relative}
+    .scan-circle::after{content:'';position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:30px;height:3px;background:#1a1a2e;border-radius:2px}
+    .scan-circle svg{width:28px;height:28px;fill:#fff}
+    .nav-item.scan .nav-label{color:#1a1a2e;font-weight:600;margin-top:2px}
+    ::-webkit-scrollbar{width:0}
+    @media(max-width:380px){.header-title .title{font-size:38px}.card-content{flex-direction:column;text-align:center}.btn-visi-misi{margin:10px auto 0}.visi-text,.misi-list{padding-left:0}}
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <img src="source/image/logobbc2.png" class="stamp-watermark" alt="">
+    <div class="header-main">
+      <div class="header-title">
+        <span class="label">Calon Ketua</span>
+        <span class="title">OSIS</span>
+      </div>
+      <div class="header-divider"></div>
+      <div class="header-subtitle-area">
+        <div class="header-subtitle">Pilih Pemimpin Terbaik<br>Untuk Sekolah Kita</div>
+      </div>
+    </div>
+    <div class="header-year">Tahun Ajaran 2025/2026</div>
+    <div class="header-deco"></div>
+  </div>
+
+  <div class="cards-container" id="cards-container">
+    <!-- Loading skeleton -->
+    <div class="loading-cards">
+      <div class="skel"><div class="skel-line" style="width:40%"></div><div class="skel-line" style="width:80%"></div><div class="skel-line" style="width:60%"></div></div>
+      <div class="skel"><div class="skel-line" style="width:40%"></div><div class="skel-line" style="width:80%"></div><div class="skel-line" style="width:60%"></div></div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="beranda.html" class="nav-item active">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span class="nav-label">Beranda</span>
+    </a>
+    <a href="scan.html" class="nav-item scan">
+      <div class="scan-circle">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="8" height="8" rx="1" fill="none" stroke="white" stroke-width="1.5"/><rect x="14" y="2" width="8" height="8" rx="1" fill="none" stroke="white" stroke-width="1.5"/><rect x="2" y="14" width="8" height="8" rx="1" fill="none" stroke="white" stroke-width="1.5"/><rect x="4" y="4" width="4" height="4" rx=".5" fill="white"/><rect x="16" y="4" width="4" height="4" rx=".5" fill="white"/><rect x="4" y="16" width="4" height="4" rx=".5" fill="white"/><rect x="14" y="14" width="3" height="3" fill="white"/><rect x="19" y="14" width="3" height="3" fill="white"/><rect x="14" y="19" width="3" height="3" fill="white"/><rect x="19" y="19" width="3" height="3" fill="white"/></svg>
+      </div>
+      <span class="nav-label">Scan</span>
+    </a>
+    <a href="profil.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span class="nav-label">Profil</span>
+    </a>
+  </nav>
+
+  <script src="source/js/api.js"></script>
+  <script>
+    // Guard: wajib login
+    if (!requireLogin()) throw new Error('Not logged in');
+
+    const user = getSession();
+    let paslon  = [];
+
+    // ── Render semua kartu paslon ──
+    function renderKartu(data, sudahMemilih) {
+      const container = document.getElementById('cards-container');
+      let html = '';
+
+      // Banner jika sudah memilih
+      if (sudahMemilih) {
+        html += `
+          <div class="voted-banner">
+            <div class="icon">✅</div>
+            <div class="text"><strong>Kamu sudah memilih!</strong>Suara kamu telah tercatat. Terima kasih telah berpartisipasi.</div>
+          </div>`;
+      }
+
+      data.forEach(p => {
+        const noLabel = String(p.nomor_urut).padStart(2,'0');
+        const fotoSrc = p.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nama_ketua)}&background=1a1a2e&color=fff&size=200`;
+        const misiLines = (p.misi || '').split('\n').filter(Boolean);
+
+        // Tombol pilih (hanya tampil jika belum memilih)
+        const btnPilih = sudahMemilih ? '' : `
+          `;
+
+        html += `
+          <div class="card" id="card-${p.id}">
+            <div class="no-stamp">NO.${noLabel}</div>
+            <div class="paslon-label">Paslon ${noLabel}</div>
+            <div class="card-content">
+              <div class="card-photo">
+                <img src="${fotoSrc}" alt="Paslon ${noLabel}" onerror="this.src='https://ui-avatars.com/api/?name=P${noLabel}&background=1a1a2e&color=fff&size=200'">
+              </div>
+              <div class="card-info">
+                <div class="name">${p.nama_ketua}</div>
+                <div class="kelas">&amp; ${p.nama_wakil}</div>
+                <div class="quote">"${(p.visi||'').substring(0,60)}..."</div>
+                <button class="btn-visi-misi" onclick="toggleVisimisi('vm-${p.id}', this)">
+                  Lihat Visi Misi <span class="arrow">›</span>
+                </button>
+                ${btnPilih}
+              </div>
+            </div>
+          </div>
+
+          <div class="visimisi-wrapper" id="vm-${p.id}">
+            <div class="visimisi-panel">
+              <div class="tape tape-top-right"></div>
+              <div class="tape tape-bottom-left"></div>
+              <div class="visi-section">
+                <div class="section-header">
+                  <div class="section-icon visi-icon">
+                    <svg viewBox="0 0 24 24" fill="white"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                  </div>
+                  <span class="section-label">Visi</span>
+                </div>
+                <p class="visi-text">${p.visi || '-'}</p>
+              </div>
+              <div class="visi-divider"></div>
+              <div class="misi-section">
+                <div class="section-header">
+                  <div class="section-icon misi-icon">
+                    <svg viewBox="0 0 24 24" fill="white"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+                  </div>
+                  <span class="section-label">Misi</span>
+                </div>
+                <ul class="misi-list">
+                  ${misiLines.map((m,i) => `<li><span class="misi-number">${i+1}</span>${m}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function toggleVisimisi(id, btn) {
+      const wrapper = document.getElementById(id);
+      const isOpen  = wrapper.classList.contains('open');
+      document.querySelectorAll('.visimisi-wrapper.open').forEach(el => el.classList.remove('open'));
+      document.querySelectorAll('.btn-visi-misi.active').forEach(el => el.classList.remove('active'));
+      if (!isOpen) {
+        wrapper.classList.add('open');
+        btn.classList.add('active');
+        setTimeout(() => wrapper.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+      }
+    }
+
+    async function pilihPaslon(paslonId) {
+      const p = paslon.find(x => x.id == paslonId);
+      if (!p) return;
+
+      showVoteModal(p, async () => {
+        // Disable semua tombol pilih
+        document.querySelectorAll('.btn-pilih').forEach(b => b.disabled = true);
+
+        try {
+          const data = await apiVote(paslonId);
+          if (data.success) {
+            // Update session
+            const s = getSession();
+            s.sudah_memilih = true;
+            setSession(s);
+            showToast('Suara berhasil dicatat! 🎉', 'success');
+            // Reload tampilan
+            setTimeout(() => loadPaslon(), 800);
+          } else {
+            showToast(data.message || 'Gagal menyimpan suara', 'error');
+            document.querySelectorAll('.btn-pilih').forEach(b => b.disabled = false);
+          }
+        } catch {
+          showToast('Koneksi ke server gagal', 'error');
+          document.querySelectorAll('.btn-pilih').forEach(b => b.disabled = false);
+        }
+      });
+    }
+
+    async function loadPaslon() {
+      try {
+        const data = await apiGetPaslon();
+        if (data.success) {
+          paslon = data.data.paslon;
+          const s = getSession();
+          renderKartu(paslon, s?.sudah_memilih);
+        } else {
+          document.getElementById('cards-container').innerHTML = `<p style="text-align:center;color:#888;padding:20px">${data.message}</p>`;
+        }
+      } catch {
+        document.getElementById('cards-container').innerHTML = `<p style="text-align:center;color:#c0392b;padding:20px">Gagal memuat data. Cek koneksi.</p>`;
+      }
+    }
+
+    loadPaslon();
+  </script>
+</body>
+</html>

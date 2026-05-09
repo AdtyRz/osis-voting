@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scan QR Code - Calon Ketua OSIS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background-color:#f5f0e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;max-width:420px;margin:0 auto;position:relative;overflow-x:hidden}
+    .header{text-align:center;padding:35px 20px 20px;width:100%;position:relative}
+    .header-main{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+    .header-title{display:flex;flex-direction:column;align-items:center}
+    .header-title .label{font-weight:300;font-size:13px;color:#3a3a3a;letter-spacing:1px}
+    .header-title .title{font-family:'Playfair Display',serif;font-weight:900;font-size:48px;color:#1a1a2e;letter-spacing:3px;line-height:1}
+    .header-divider{width:2px;height:60px;background-color:#1a1a2e;opacity:.3}
+    .header-subtitle-area{display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .header-subtitle{font-weight:600;font-size:8px;color:#555;letter-spacing:2.5px;text-transform:uppercase;line-height:1.6;text-align:center}
+    .header-year{font-weight:400;font-size:11px;color:#3a3a3a;letter-spacing:2px;margin-top:15px}
+    .stamp-watermark{position:absolute;top:15px;right:20px;width:120px;height:90px;opacity:1;transform:rotate(-15deg);object-fit:contain;z-index:0}
+    .header-deco{width:100%;height:1px;background:linear-gradient(to right,transparent,#c4b89a,transparent);margin-top:10px}
+    .scan-section{width:100%;padding:20px 15px;display:flex;flex-direction:column;align-items:center;gap:22px;margin-bottom:90px}
+    .scan-label{background:#1a1a2e;color:#fff;font-weight:600;font-size:12px;letter-spacing:2px;padding:8px 20px;text-transform:uppercase;transform:rotate(-2deg);box-shadow:0 4px 10px rgba(0,0,0,.1)}
+    .qr-card{background:#fffdf7;border-radius:15px;padding:24px 20px;position:relative;box-shadow:0 2px 15px rgba(0,0,0,.08),0 8px 30px rgba(0,0,0,.05);width:100%;text-align:center}
+    .qr-card::before{content:'';position:absolute;top:-8px;left:0;right:0;height:12px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 12'%3E%3Cpath d='M0 12 Q10 0 20 8 Q30 0 40 6 Q50 0 60 10 Q70 0 80 5 Q90 0 100 9 Q110 0 120 7 Q130 0 140 10 Q150 0 160 4 Q170 0 180 8 Q190 0 200 6 Q210 0 220 10 Q230 0 240 5 Q250 0 260 9 Q270 0 280 7 Q290 0 300 10 Q310 0 320 4 Q330 0 340 8 Q350 0 360 6 Q370 0 380 10 Q390 0 400 8 L400 0 L0 0 Z' fill='%23f5f0e8'/%3E%3C/svg%3E");background-size:contain;z-index:2}
+    .qr-card-description{font-size:12px;color:#555;line-height:1.6;margin-bottom:20px;padding:0 10px}
+    .voted-state{padding:20px;text-align:center}
+    .voted-state .icon{font-size:48px;margin-bottom:12px}
+    .voted-state h3{font-family:'Playfair Display',serif;font-size:20px;color:#1a1a2e;margin-bottom:8px}
+    .voted-state p{font-size:13px;color:#666;line-height:1.6}
+    .qr-scanner-container{position:relative;width:100%;max-width:280px;margin:0 auto}
+    #qr-reader{width:100%;border-radius:12px;overflow:hidden}
+    #qr-reader video{border-radius:12px!important}
+    #qr-reader__dashboard_section_csr button{background:#1a1a2e!important;color:#fff!important;border:none!important;padding:10px 20px!important;border-radius:8px!important;font-family:'Poppins',sans-serif!important;font-size:13px!important;font-weight:600!important;cursor:pointer!important;margin-top:10px!important}
+    #qr-reader__dashboard_section_swaplink{display:none!important}
+    #qr-reader__header_message{display:none!important}
+    #qr-reader__camera_selection{width:100%!important;padding:8px!important;border-radius:8px!important;border:1px solid #ddd!important;font-family:'Poppins',sans-serif!important;font-size:12px!important;margin-bottom:8px!important;background:#fff}
+    .btn-scan-start{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:240px;margin:0 auto;padding:14px 20px;background:#1a1a2e;color:#fff;border:none;border-radius:10px;font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;letter-spacing:.5px}
+    .btn-scan-start:hover{background:#2a2a4e;transform:translateY(-1px)}
+    .btn-scan-stop{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:240px;margin:10px auto 0;padding:10px 20px;background:transparent;color:#c0392b;border:1.5px solid #c0392b;border-radius:10px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .3s}
+    .btn-scan-stop:hover{background:rgba(192,57,43,.1)}
+    .scan-status{margin-top:14px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:600;text-align:center;display:none}
+    .scan-status.scanning{display:block;background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9}
+    .scan-status.success{display:block;background:#e8f5e9;color:#1b5e20;border:1px solid #81c784}
+    .scan-status.error{display:block;background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+    .instructions-section{width:100%;background:#fffdf7;border-radius:15px;padding:25px 20px;position:relative;box-shadow:0 2px 15px rgba(0,0,0,.08),0 8px 30px rgba(0,0,0,.05)}
+    .instructions-section::before{content:'';position:absolute;top:-8px;left:0;right:0;height:12px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 12'%3E%3Cpath d='M0 12 Q10 0 20 8 Q30 0 40 6 Q50 0 60 10 Q70 0 80 5 Q90 0 100 9 Q110 0 120 7 Q130 0 140 10 Q150 0 160 4 Q170 0 180 8 Q190 0 200 6 Q210 0 220 10 Q230 0 240 5 Q250 0 260 9 Q270 0 280 7 Q290 0 300 10 Q310 0 320 4 Q330 0 340 8 Q350 0 360 6 Q370 0 380 10 Q390 0 400 8 L400 0 L0 0 Z' fill='%23f5f0e8'/%3E%3C/svg%3E");background-size:contain;z-index:2}
+    .instructions-title{font-family:'Playfair Display',serif;font-weight:700;font-size:16px;color:#1a1a2e;letter-spacing:2px;margin-bottom:20px;padding-left:10px}
+    .instruction-list{list-style:none}
+    .instruction-item{display:flex;align-items:flex-start;gap:15px;margin-bottom:18px;padding-left:10px}
+    .instruction-icon{width:35px;height:35px;border-radius:50%;background:#f5f0e8;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .instruction-icon svg{width:18px;height:18px;fill:#1a1a2e}
+    .instruction-text{flex:1;font-size:12px;color:#333;line-height:1.6;padding-top:8px;border-bottom:1px solid #e0d5c7;padding-bottom:8px}
+    .instruction-number{font-weight:700;color:#1a1a2e;margin-right:5px}
+    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:#fff;display:flex;align-items:center;justify-content:space-around;padding:8px 10px 12px;box-shadow:0 -4px 20px rgba(0,0,0,.08);border-radius:20px 20px 0 0;z-index:100;height:70px}
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;text-decoration:none;color:#999;flex:1}
+    .nav-item.active{color:#1a1a2e}
+    .nav-item svg{width:24px;height:24px;fill:currentColor}
+    .nav-item .nav-label{font-size:9px;font-weight:500;letter-spacing:.5px}
+    .nav-item.scan{margin-top:-25px}
+    .scan-circle{width:58px;height:58px;background:#1a1a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(26,26,46,.3);position:relative}
+    .scan-circle::after{content:'';position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:30px;height:3px;background:#1a1a2e;border-radius:2px}
+    .scan-circle svg{width:28px;height:28px;fill:#fff}
+    .nav-item.scan .nav-label{color:#1a1a2e;font-weight:600;margin-top:2px}
+    ::-webkit-scrollbar{width:0}
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <img src="source/image/logobbc2.png" class="stamp-watermark" alt="">
+    <div class="header-main">
+      <div class="header-title">
+        <span class="label">Calon Ketua</span>
+        <span class="title">OSIS</span>
+      </div>
+      <div class="header-divider"></div>
+      <div class="header-subtitle-area">
+        <div class="header-subtitle">Pilih Pemimpin Terbaik<br>Untuk Sekolah Kita</div>
+      </div>
+    </div>
+    <div class="header-year">Tahun Ajaran 2025/2026</div>
+    <div class="header-deco"></div>
+  </div>
+
+  <div class="scan-section">
+    <div class="scan-label">Scan QR Code</div>
+
+    <div class="qr-card">
+      <!-- State: sudah memilih -->
+      <div id="state-voted" style="display:none">
+        <div class="voted-state">
+          <div class="icon">✅</div>
+          <h3>Suara Tercatat!</h3>
+          <p>Kamu sudah memberikan suaramu.<br>Terima kasih telah berpartisipasi dalam pemilihan Ketua OSIS.</p>
+        </div>
+      </div>
+
+      <!-- State: belum memilih -->
+      <div id="state-scanner">
+        <p class="qr-card-description">Arahkan kamera ke QR Code yang diberikan panitia untuk melakukan pemilihan.</p>
+        <div class="qr-scanner-container">
+          <div id="qr-reader"></div>
+        </div>
+        <div class="scan-status" id="scan-status"></div>
+        <button class="btn-scan-start" id="btn-start" onclick="startScanner()">📷 Aktifkan Kamera</button>
+        <button class="btn-scan-stop"  id="btn-stop"  onclick="stopScanner()" style="display:none">✕ Tutup Kamera</button>
+      </div>
+    </div>
+
+    <div class="instructions-section">
+      <h2 class="instructions-title">CARA PENGGUNAAN</h2>
+      <ul class="instruction-list">
+        <li class="instruction-item">
+          <div class="instruction-icon"><svg viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4z"/></svg></div>
+          <div class="instruction-text"><span class="instruction-number">1.</span>Minta QR Code dari panitia pemilihan</div>
+        </li>
+        <li class="instruction-item">
+          <div class="instruction-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg></div>
+          <div class="instruction-text"><span class="instruction-number">2.</span>Tekan <strong>"Aktifkan Kamera"</strong> lalu izinkan akses kamera</div>
+        </li>
+        <li class="instruction-item">
+          <div class="instruction-icon"><svg viewBox="0 0 24 24"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm6 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></div>
+          <div class="instruction-text"><span class="instruction-number">3.</span>Arahkan kamera ke QR Code hingga terdeteksi otomatis</div>
+        </li>
+        <li class="instruction-item">
+          <div class="instruction-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg></div>
+          <div class="instruction-text"><span class="instruction-number">4.</span>Konfirmasi pilihan — suara tidak dapat diubah setelah dikonfirmasi</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="beranda.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span class="nav-label">Beranda</span>
+    </a>
+    <a href="scan.html" class="nav-item scan active">
+      <div class="scan-circle">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="8" height="8" rx="1" fill="none" stroke="white" stroke-width="1.5"/><rect x="14" y="2" width="8" height="8" rx="1" fill="none" stroke="white" stroke-width="1.5"/><rect x="2" y="14" width="8" height="8" rx="1" fill="none" stroke="white" stroke-width="1.5"/><rect x="4" y="4" width="4" height="4" rx=".5" fill="white"/><rect x="16" y="4" width="4" height="4" rx=".5" fill="white"/><rect x="4" y="16" width="4" height="4" rx=".5" fill="white"/><rect x="14" y="14" width="3" height="3" fill="white"/><rect x="19" y="14" width="3" height="3" fill="white"/><rect x="14" y="19" width="3" height="3" fill="white"/><rect x="19" y="19" width="3" height="3" fill="white"/></svg>
+      </div>
+      <span class="nav-label">Scan</span>
+    </a>
+    <a href="profil.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span class="nav-label">Profil</span>
+    </a>
+  </nav>
+
+  <script src="source/js/api.js"></script>
+  <script>
+    if (!requireLogin()) throw new Error('Not logged in');
+
+    const user = getSession();
+    let html5QrCode  = null;
+    let isProcessing = false;
+
+    // Kalau sudah memilih, sembunyikan scanner
+    if (user.sudah_memilih) {
+      document.getElementById('state-voted').style.display  = 'block';
+      document.getElementById('state-scanner').style.display = 'none';
+    }
+
+    function setStatus(msg, type) {
+      const el = document.getElementById('scan-status');
+      el.textContent = msg;
+      el.className   = 'scan-status' + (type ? ' ' + type : '');
+    }
+
+    async function startScanner() {
+      if (html5QrCode) return;
+      document.getElementById('btn-start').style.display = 'none';
+      document.getElementById('btn-stop').style.display  = 'flex';
+      setStatus('📷 Mengaktifkan kamera...', 'scanning');
+
+      html5QrCode = new Html5Qrcode('qr-reader');
+      try {
+        await html5QrCode.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 220, height: 220 } },
+          onScanSuccess,
+          () => {} // silent fail saat belum ada QR
+        );
+        setStatus('✅ Kamera aktif — arahkan ke QR Code', 'scanning');
+      } catch (err) {
+        setStatus('❌ Kamera tidak bisa diakses. Pastikan izin kamera diaktifkan.', 'error');
+        document.getElementById('btn-start').style.display = 'flex';
+        document.getElementById('btn-stop').style.display  = 'none';
+        html5QrCode = null;
+      }
+    }
+
+    async function stopScanner() {
+      if (html5QrCode) {
+        try { await html5QrCode.stop(); } catch {}
+        html5QrCode = null;
+      }
+      document.getElementById('btn-start').style.display = 'flex';
+      document.getElementById('btn-stop').style.display  = 'none';
+      setStatus('', '');
+    }
+
+    // Format QR yang valid: "OSIS_VOTE:1"  (angka = paslon_id)
+    // Buat QR Code panitia menggunakan format ini!
+    async function onScanSuccess(decodedText) {
+      if (isProcessing) return;
+      if (!decodedText.startsWith('OSIS_VOTE:')) {
+        setStatus('⚠️ QR Code tidak valid! Gunakan QR dari panitia.', 'error');
+        return;
+      }
+
+      const paslonId = parseInt(decodedText.replace('OSIS_VOTE:', ''));
+      if (!paslonId || isNaN(paslonId)) {
+        setStatus('⚠️ QR Code tidak dikenali.', 'error');
+        return;
+      }
+
+      isProcessing = true;
+      await stopScanner();
+      setStatus('🔄 QR terdeteksi! Memuat data paslon...', 'scanning');
+
+      try {
+        const listData = await apiGetPaslon();
+        if (!listData.success) throw new Error(listData.message);
+
+        const paslon = listData.data.paslon.find(p => p.id == paslonId);
+        if (!paslon) {
+          setStatus('❌ Paslon tidak ditemukan di database.', 'error');
+          isProcessing = false;
+          return;
+        }
+
+        // Modal konfirmasi
+        showVoteModal(paslon, async () => {
+          setStatus('🔄 Menyimpan suara...', 'scanning');
+          try {
+            const voteData = await apiVote(paslonId);
+            if (voteData.success) {
+              const s = getSession();
+              s.sudah_memilih = true;
+              setSession(s);
+              // Ganti tampilan
+              document.getElementById('state-voted').style.display  = 'block';
+              document.getElementById('state-scanner').style.display = 'none';
+              showToast('Suara berhasil dicatat! 🎉', 'success');
+            } else {
+              setStatus('❌ ' + (voteData.message || 'Gagal menyimpan suara'), 'error');
+              isProcessing = false;
+            }
+          } catch {
+            setStatus('❌ Koneksi server gagal. Coba lagi.', 'error');
+            isProcessing = false;
+          }
+        });
+
+        // Reset jika modal ditutup tanpa konfirmasi setelah 60 detik
+        setTimeout(() => { if (!getSession().sudah_memilih) isProcessing = false; }, 60000);
+
+      } catch (err) {
+        setStatus('❌ Error: ' + err.message, 'error');
+        isProcessing = false;
+      }
+    }
+
+    window.addEventListener('beforeunload', () => stopScanner());
+  </script>
+</body>
+</html>

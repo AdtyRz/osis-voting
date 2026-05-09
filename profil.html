@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil - Calon Ketua OSIS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background-color:#f5f0e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;max-width:420px;margin:0 auto;position:relative;overflow-x:hidden}
+    .header{text-align:center;padding:35px 20px 20px;width:100%;position:relative}
+    .header-main{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+    .header-title{display:flex;flex-direction:column;align-items:center}
+    .header-title .label{font-weight:300;font-size:13px;color:#3a3a3a;letter-spacing:1px}
+    .header-title .title{font-family:'Playfair Display',serif;font-weight:900;font-size:48px;color:#1a1a2e;letter-spacing:3px;line-height:1}
+    .header-divider{width:2px;height:60px;background-color:#1a1a2e;opacity:.3}
+    .header-subtitle-area{display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .header-subtitle{font-weight:600;font-size:8px;color:#555;letter-spacing:2.5px;text-transform:uppercase;line-height:1.6;text-align:center}
+    .header-year{font-weight:400;font-size:11px;color:#3a3a3a;letter-spacing:2px;margin-top:15px}
+    .stamp-watermark{position:absolute;top:15px;right:20px;width:120px;height:90px;opacity:1;transform:rotate(-15deg);object-fit:contain;z-index:0}
+    .header-deco{width:100%;height:1px;background:linear-gradient(to right,transparent,#c4b89a,transparent);margin-top:10px}
+    .profile-section{width:100%;padding:20px 15px;display:flex;flex-direction:column;align-items:center;gap:25px;margin-bottom:90px}
+    .profile-card{background-image:url('source/image/back-profil.png');background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#fffdf7;border-radius:15px;padding:40px 30px 30px;position:relative;box-shadow:0 2px 15px rgba(0,0,0,.08),0 8px 30px rgba(0,0,0,.05);width:100%;text-align:center;min-height:220px}
+    .profile-card::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;z-index:1}
+    .tape{position:absolute;width:60px;height:20px;background:rgba(232,197,100,.6);z-index:10}
+    .tape-top-right{top:-10px;right:15px;transform:rotate(25deg)}
+    .tape-bottom-left{bottom:-10px;left:15px;transform:rotate(-25deg)}
+    .butterfly{position:absolute;top:-15px;left:15px;width:50px;height:40px;z-index:15;transform:rotate(-15deg)}
+    .butterfly img{width:100%;height:100%;filter:drop-shadow(2px 2px 3px rgba(0,0,0,.2))}
+    .profile-avatar{width:100px;height:100px;border-radius:50%;background:#f5f0e8;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;border:4px solid #fff;box-shadow:0 4px 15px rgba(0,0,0,.1);position:relative;z-index:5;overflow:hidden}
+    .profile-avatar svg{width:60px;height:60px;fill:#1a1a2e}
+    .profile-name{font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:#1a1a2e;letter-spacing:2px;margin-bottom:6px;text-transform:uppercase;position:relative;z-index:5;word-break:break-word}
+    .profile-student-info{font-size:12px;color:#666;letter-spacing:1px;font-weight:500;position:relative;z-index:5}
+
+    /* Status memilih badge */
+    .voted-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,.15);color:#166534;border:1px solid #4ade80;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;position:relative;z-index:5;margin-top:8px}
+    .not-voted-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,.1);color:#991b1b;border:1px solid #f87171;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;position:relative;z-index:5;margin-top:8px}
+
+    .details-card{background:#fffdf7;border-radius:15px;padding:25px 20px;position:relative;box-shadow:0 2px 15px rgba(0,0,0,.08),0 8px 30px rgba(0,0,0,.05);width:100%}
+    .detail-item{display:flex;align-items:center;gap:15px;padding:15px 10px;border-bottom:1px solid #e0d5c7}
+    .detail-item:last-child{border-bottom:none}
+    .detail-icon{width:35px;height:35px;background:#f5f0e8;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .detail-icon svg{width:18px;height:18px;fill:#1a1a2e}
+    .detail-label{flex:1;font-size:13px;color:#555;font-weight:500}
+    .detail-value{font-size:13px;color:#1a1a2e;font-weight:600;text-align:right;max-width:160px;word-break:break-word}
+    .logout-btn{width:100%;max-width:300px;padding:15px 25px;background:transparent;border:2px solid #8b4513;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:all .3s;margin-top:10px}
+    .logout-btn:hover{background:#8b4513;color:#fff;transform:translateY(-2px);box-shadow:0 4px 15px rgba(139,69,19,.3)}
+    .logout-btn svg{width:22px;height:22px;fill:#8b4513;transition:fill .3s}
+    .logout-btn:hover svg{fill:#fff}
+    .logout-btn span{font-size:14px;font-weight:600;letter-spacing:2px;color:#8b4513;text-transform:uppercase;transition:color .3s}
+    .logout-btn:hover span{color:#fff}
+    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:#fff;display:flex;align-items:center;justify-content:space-around;padding:8px 10px 12px;box-shadow:0 -4px 20px rgba(0,0,0,.08);border-radius:20px 20px 0 0;z-index:100;height:70px}
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;text-decoration:none;color:#999;flex:1}
+    .nav-item.active{color:#1a1a2e}
+    .nav-item svg{width:24px;height:24px;fill:currentColor}
+    .nav-item .nav-label{font-size:9px;font-weight:500;letter-spacing:.5px}
+    .nav-item.scan{margin-top:-25px}
+    .scan-circle{width:58px;height:58px;background:#1a1a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(26,26,46,.3);position:relative}
+    .scan-circle::after{content:'';position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:30px;height:3px;background:#1a1a2e;border-radius:2px}
+    .scan-circle svg{width:28px;height:28px;fill:#fff}
+    .nav-item.scan .nav-label{color:#1a1a2e;font-weight:600;margin-top:2px}
+    ::-webkit-scrollbar{width:0}
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <img src="source/image/logobbc2.png" class="stamp-watermark" alt="">
+    <div class="header-main">
+      <div class="header-title">
+        <span class="label">Calon Ketua</span>
+        <span class="title">OSIS</span>
+      </div>
+      <div class="header-divider"></div>
+      <div class="header-subtitle-area">
+        <div class="header-subtitle">Pilih Pemimpin Terbaik<br>Untuk Sekolah Kita</div>
+      </div>
+    </div>
+    <div class="header-year">Tahun Ajaran 2025/2026</div>
+    <div class="header-deco"></div>
+  </div>
+
+  <div class="profile-section">
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="butterfly"><img src="source/image/butterfly.png" alt=""></div>
+      <img src="source/image/sobek.png" class="tape tape-top-right" alt="">
+      <img src="source/image/sobek.png" class="tape tape-bottom-left" alt="">
+
+      <div class="profile-avatar">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+
+      <div class="profile-name" id="prof-nama">—</div>
+      <div class="profile-student-info" id="prof-kelas">—</div>
+      <div id="prof-status"></div>
+    </div>
+
+    <!-- Details Card -->
+    <div class="details-card">
+      <div class="detail-item">
+        <div class="detail-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <div class="detail-label">Nama</div>
+        <div class="detail-value" id="detail-nama">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </div>
+        <div class="detail-label">Kelas</div>
+        <div class="detail-value" id="detail-kelas">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+        </div>
+        <div class="detail-label">NISN</div>
+        <div class="detail-value" id="detail-nisn">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+        </div>
+        <div class="detail-label">Status Memilih</div>
+        <div class="detail-value" id="detail-status">—</div>
+      </div>
+    </div>
+
+    <button class="logout-btn" onclick="konfirmasiLogout()">
+      <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+      <span>LOGOUT</span>
+    </button>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="beranda.html" class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span class="nav-label">Beranda</span>
+    </a>
+    <a href="scan.html" class="nav-item scan">
+      <div class="scan-circle">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="8" height="8" rx="1" fill="none" stroke="white" stroke-width="1.5"/><rect x="14" y="2" width="8" height="8" rx="1" fill="none" stroke="white" stroke-width="1.5"/><rect x="2" y="14" width="8" height="8" rx="1" fill="none" stroke="white" stroke-width="1.5"/><rect x="4" y="4" width="4" height="4" rx=".5" fill="white"/><rect x="16" y="4" width="4" height="4" rx=".5" fill="white"/><rect x="4" y="16" width="4" height="4" rx=".5" fill="white"/><rect x="14" y="14" width="3" height="3" fill="white"/><rect x="19" y="14" width="3" height="3" fill="white"/><rect x="14" y="19" width="3" height="3" fill="white"/><rect x="19" y="19" width="3" height="3" fill="white"/></svg>
+      </div>
+      <span class="nav-label">Scan</span>
+    </a>
+    <a href="profil.html" class="nav-item active">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span class="nav-label">Profil</span>
+    </a>
+  </nav>
+
+  <script src="source/js/api.js"></script>
+  <script>
+    if (!requireLogin()) throw new Error('Not logged in');
+
+    const user = getSession();
+
+    // Isi data dari session
+    document.getElementById('prof-nama').textContent    = user.nama   || '—';
+    document.getElementById('prof-kelas').textContent   = 'SISWA KELAS ' + (user.kelas || '—');
+    document.getElementById('detail-nama').textContent  = user.nama   || '—';
+    document.getElementById('detail-kelas').textContent = user.kelas  || '—';
+    document.getElementById('detail-nisn').textContent  = user.nisn   || '—'; // nisn mungkin tidak ada di session minimal; tampilkan kalau ada
+
+    if (user.sudah_memilih) {
+      document.getElementById('prof-status').innerHTML = '<div class="voted-badge">✅ Sudah Memilih</div>';
+      document.getElementById('detail-status').innerHTML = '<span style="color:#166534;font-weight:700">✅ Sudah</span>';
+    } else {
+      document.getElementById('prof-status').innerHTML = '<div class="not-voted-badge">⏳ Belum Memilih</div>';
+      document.getElementById('detail-status').innerHTML = '<span style="color:#991b1b;font-weight:700">⏳ Belum</span>';
+    }
+
+    function konfirmasiLogout() {
+      if (confirm('Yakin ingin keluar dari akun?')) {
+        apiLogout();
+      }
+    }
+  </script>
+</body>
+</html>

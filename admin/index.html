@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Pemilihan Ketua OSIS</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222636;
+    --border: #2e3347;
+    --accent: #4f8ef7;
+    --accent2: #7c3aed;
+    --green: #22c55e;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --radius: 14px;
+    --font: 'Segoe UI', system-ui, sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); min-height:100vh; display:flex; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 240px; min-height:100vh; background:var(--surface);
+    border-right:1px solid var(--border); display:flex; flex-direction:column;
+    position:fixed; top:0; left:0; z-index:100;
+  }
+  .sidebar-logo {
+    padding: 24px 20px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px;
+  }
+  .sidebar-logo .logo-icon {
+    width:40px; height:40px; border-radius:10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+  }
+  .sidebar-logo .logo-text { font-size:14px; font-weight:700; line-height:1.3; }
+  .sidebar-logo .logo-text span { display:block; font-size:11px; color:var(--muted); font-weight:400; }
+  .sidebar-nav { flex:1; padding:16px 12px; }
+  .nav-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); padding:0 8px 8px; margin-top:8px; }
+  .nav-item {
+    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
+    cursor:pointer; font-size:14px; color:var(--muted); transition:.15s; margin-bottom:2px;
+    border:none; background:none; width:100%; text-align:left;
+  }
+  .nav-item:hover { background:var(--surface2); color:var(--text); }
+  .nav-item.active { background:rgba(79,142,247,.15); color:var(--accent); }
+  .nav-item .icon { font-size:18px; width:22px; text-align:center; }
+  .sidebar-footer { padding:16px 12px; border-top:1px solid var(--border); }
+  .admin-badge {
+    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
+    background:var(--surface2); margin-bottom:8px;
+  }
+  .admin-avatar { width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; }
+  .admin-info .name { font-size:13px; font-weight:600; }
+  .admin-info .role { font-size:11px; color:var(--muted); }
+  .btn-logout { width:100%; padding:9px; border-radius:10px; border:1px solid var(--border); background:none; color:var(--red); font-size:13px; cursor:pointer; transition:.15s; }
+  .btn-logout:hover { background:rgba(239,68,68,.1); }
+
+  /* ── Main Content ── */
+  .main { margin-left:240px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
+  .topbar {
+    padding:16px 28px; border-bottom:1px solid var(--border);
+    background:var(--surface); display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:50;
+  }
+  .topbar h1 { font-size:18px; font-weight:700; }
+  .topbar .subtitle { font-size:12px; color:var(--muted); margin-top:2px; }
+  .badge-aktif { padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+  .badge-aktif.on { background:rgba(34,197,94,.15); color:var(--green); }
+  .badge-aktif.off { background:rgba(239,68,68,.15); color:var(--red); }
+
+  .content { padding:28px; flex:1; }
+
+  /* ── Pages ── */
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* ── Stat Cards ── */
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+  .stat-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:20px; display:flex; align-items:center; gap:16px;
+  }
+  .stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+  .stat-value { font-size:26px; font-weight:800; line-height:1; }
+  .stat-label { font-size:12px; color:var(--muted); margin-top:4px; }
+
+  /* ── Charts ── */
+  .charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px; }
+  .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+  .chart-card h3 { font-size:14px; font-weight:700; margin-bottom:16px; color:var(--text); }
+  .chart-wrap { position:relative; height:240px; }
+
+  /* ── Table ── */
+  .table-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .table-toolbar { padding:16px 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .table-toolbar h3 { font-size:14px; font-weight:700; flex:1; }
+  .inp { padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:13px; outline:none; }
+  .inp:focus { border-color:var(--accent); }
+  .btn { padding:8px 16px; border-radius:8px; border:none; font-size:13px; font-weight:600; cursor:pointer; transition:.15s; }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { opacity:.85; }
+  .btn-success { background:var(--green); color:#fff; }
+  .btn-success:hover { opacity:.85; }
+  .btn-danger { background:transparent; border:1px solid var(--red); color:var(--red); }
+  .btn-danger:hover { background:rgba(239,68,68,.1); }
+  .btn-sm { padding:5px 10px; font-size:12px; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { padding:12px 16px; text-align:left; font-size:13px; }
+  th { background:var(--surface2); font-weight:600; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
+  tr:not(:last-child) td { border-bottom:1px solid var(--border); }
+  tr:hover td { background:rgba(255,255,255,.02); }
+  .chip { display:inline-flex; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .chip-green { background:rgba(34,197,94,.15); color:var(--green); }
+  .chip-red { background:rgba(239,68,68,.15); color:var(--red); }
+  .chip-blue { background:rgba(79,142,247,.15); color:var(--accent); }
+  .pagination { padding:12px 16px; display:flex; align-items:center; gap:8px; justify-content:flex-end; border-top:1px solid var(--border); }
+  .page-info { font-size:12px; color:var(--muted); flex:1; }
+
+  /* ── Modal ── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:200; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:.2s; }
+  .modal-overlay.open { opacity:1; pointer-events:all; }
+  .modal { background:var(--surface); border:1px solid var(--border); border-radius:20px; width:100%; max-width:540px; max-height:90vh; overflow-y:auto; }
+  .modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .modal-header h2 { font-size:16px; font-weight:700; }
+  .modal-close { background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; }
+  .modal-body { padding:24px; display:flex; flex-direction:column; gap:16px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
+  .form-group label { font-size:12px; font-weight:600; color:var(--muted); }
+  .form-group input, .form-group textarea, .form-group select {
+    padding:10px 14px; border-radius:10px; border:1px solid var(--border);
+    background:var(--surface2); color:var(--text); font-size:14px; outline:none; font-family:inherit;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color:var(--accent); }
+  .form-group textarea { resize:vertical; min-height:80px; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+
+  .foto-preview { width:80px; height:80px; border-radius:12px; object-fit:cover; border:2px solid var(--border); }
+  .foto-placeholder { width:80px; height:80px; border-radius:12px; background:var(--surface2); border:2px dashed var(--border); display:flex; align-items:center; justify-content:center; font-size:28px; }
+
+  .loading { display:flex; align-items:center; justify-content:center; padding:40px; color:var(--muted); gap:12px; font-size:14px; }
+  .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  #toast { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:8px; }
+  .toast-item { padding:12px 18px; border-radius:12px; font-size:13px; font-weight:600; min-width:220px; animation:slideIn .25s ease; }
+  .toast-item.success { background:#166534; border:1px solid var(--green); color:#bbf7d0; }
+  .toast-item.error { background:#7f1d1d; border:1px solid var(--red); color:#fecaca; }
+  @keyframes slideIn { from { transform:translateX(60px); opacity:0; } to { transform:none; opacity:1; } }
+
+  #login-screen {
+    position:fixed; inset:0; background:var(--bg); z-index:999;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .login-box {
+    background:var(--surface); border:1px solid var(--border); border-radius:24px;
+    padding:40px; width:100%; max-width:380px;
+  }
+  .login-box h1 { font-size:22px; font-weight:800; margin-bottom:4px; }
+  .login-box p { color:var(--muted); font-size:13px; margin-bottom:28px; }
+  .login-box .form-group { margin-bottom:14px; }
+  .login-box button { width:100%; margin-top:8px; padding:12px; font-size:14px; }
+
+  @media(max-width:900px) {
+    .stats-grid { grid-template-columns:1fr 1fr; }
+    .charts-grid { grid-template-columns:1fr; }
+  }
+  @media(max-width:600px) {
+    .sidebar { width:60px; }
+    .sidebar-logo .logo-text, .nav-item span, .admin-info, .sidebar-footer .btn-logout span { display:none; }
+    .main { margin-left:60px; }
+    .stats-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div style="font-size:36px;margin-bottom:12px">🗳️</div>
+    <h1>Admin OSIS</h1>
+    <p>Masuk ke panel administrasi pemilihan</p>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="login-user" placeholder="admin" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()">Masuk</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🗳️</div>
+    <div class="logo-text">OSIS Vote<span id="nama-sekolah">Loading...</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Menu</div>
+    <button class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon">📊</span><span>Beranda</span>
+    </button>
+    <button class="nav-item" onclick="showPage('paslon')">
+      <span class="icon">👥</span><span>Data Paslon</span>
+    </button>
+    <button class="nav-item" onclick="showPage('users')">
+      <span class="icon">🎓</span><span>Data Pemilih</span>
+    </button>
+    <div class="nav-label" style="margin-top:16px">Sistem</div>
+    <button class="nav-item" onclick="showPage('pengaturan')">
+      <span class="icon">⚙️</span><span>Pengaturan</span>
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-badge">
+      <div class="admin-avatar" id="admin-avatar">A</div>
+      <div class="admin-info">
+        <div class="name" id="admin-nama">Admin</div>
+        <div class="role">Administrator</div>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">🚪 Keluar</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1 id="page-title">📊 Beranda</h1>
+      <div class="subtitle" id="page-subtitle">Grafik & statistik pemilihan</div>
+    </div>
+    <span class="badge-aktif on" id="voting-status">● Voting Aktif</span>
+  </div>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid" id="stat-cards">
+        <div class="loading"><div class="spinner"></div> Memuat data...</div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>📊 Perolehan Suara Per Paslon</h3>
+          <div class="chart-wrap"><canvas id="chartBar"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>🍩 Distribusi Suara</h3>
+          <div class="chart-wrap"><canvas id="chartDoughnut"></canvas></div>
+        </div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>📈 Partisipasi Voting</h3>
+          <div class="chart-wrap"><canvas id="chartProgress"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>⏱️ Voting Per Jam (Hari Ini)</h3>
+          <div class="chart-wrap"><canvas id="chartLine"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PASLON ── -->
+    <div class="page" id="page-paslon">
+      <div class="table-card">
+        <div class="table-toolbar">
+          <h3>👥 Daftar Pasangan Calon</h3>
+          <button class="btn btn-primary" onclick="openModalPaslon()">+ Tambah Paslon</button>
+        </div>
+        <div id="paslon-table-wrap"><div class="loading"><div class="spinner"></div> Memuat...</div></div>
+      </div>
+    </div>
+
+    <!-- ── USERS ── -->
+    <div class="page" id="page-users">
+      <div class="table-card">
+        <div class="table-toolbar">
+          <h3>🎓 Data Pemilih</h3>
+          <input class="inp" id="search-user" placeholder="Cari nama / NISN..." onkeyup="filterUsers()" style="width:180px">
+          <select class="inp" id="filter-kelas" onchange="filterUsers()" style="width:130px">
+            <option value="">Semua Kelas</option>
+          </select>
+          <select class="inp" id="filter-status" onchange="filterUsers()" style="width:140px">
+            <option value="">Semua Status</option>
+            <option value="sudah">Sudah Memilih</option>
+            <option value="belum">Belum Memilih</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModalUser()">+ Tambah User</button>
+          <a href="../api/admin/export.php?type=users" class="btn btn-success">⬇ Export CSV</a>
+        </div>
+        <div id="users-table-wrap"><div class="loading"><div class="spinner"></div> Memuat...</div></div>
+        <div class="pagination" id="users-pagination"></div>
+      </div>
+    </div>
+
+    <!-- ── PENGATURAN ── -->
+    <div class="page" id="page-pengaturan">
+      <div class="table-card" style="max-width:560px">
+        <div class="table-toolbar"><h3>⚙️ Pengaturan Sistem</h3></div>
+        <div style="padding:24px;display:flex;flex-direction:column;gap:16px" id="form-pengaturan">
+          <div class="loading"><div class="spinner"></div> Memuat...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── MODAL PASLON ── -->
+<div class="modal-overlay" id="modal-paslon">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-paslon-title">Tambah Paslon</h2>
+      <button class="modal-close" onclick="closeModal('modal-paslon')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="paslon-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>No. Urut</label>
+          <input type="number" id="paslon-nomor" min="1" placeholder="1">
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:10px">
+          <div id="paslon-foto-preview" class="foto-placeholder">📷</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nama Calon Ketua</label>
+        <input type="text" id="paslon-ketua" placeholder="Nama lengkap ketua">
+      </div>
+      <div class="form-group">
+        <label>Nama Calon Wakil Ketua</label>
+        <input type="text" id="paslon-wakil" placeholder="Nama lengkap wakil">
+      </div>
+      <div class="form-group">
+        <label>Visi</label>
+        <textarea id="paslon-visi" placeholder="Visi paslon..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Misi</label>
+        <textarea id="paslon-misi" placeholder="Misi paslon (pisah per baris)..." style="min-height:100px"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Foto Paslon (JPG/PNG, maks 15MB)</label>
+        <input type="file" id="paslon-foto" accept="image/*" onchange="previewFoto(this)">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-paslon')" style="border:1px solid var(--border);background:none;color:var(--muted)">Batal</button>
+      <button class="btn btn-primary" onclick="savePaslon()">Simpan Paslon</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL USER ── -->
+<div class="modal-overlay" id="modal-user">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-user-title">Tambah Pemilih</h2>
+      <button class="modal-close" onclick="closeModal('modal-user')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="user-id">
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input type="text" id="user-nama" placeholder="Nama siswa">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>NISN</label>
+          <input type="text" id="user-nisn" placeholder="0012345678" maxlength="10">
+        </div>
+        <div class="form-group">
+          <label>Kelas</label>
+          <input type="text" id="user-kelas" placeholder="XI IPA 1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password <span id="user-pass-hint" style="color:var(--muted);font-weight:400">(kosongkan = tidak diubah)</span></label>
+        <input type="password" id="user-password" placeholder="Min. 6 karakter">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-user')" style="border:1px solid var(--border);background:none;color:var(--muted)">Batal</button>
+      <button class="btn btn-primary" onclick="saveUser()">Simpan User</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+const API = '../api/admin';
+let charts = {};
+let userPage = 1;
+let userSearch = '', userKelas = '', userStatus = '';
+let kelasOptions = [];
+
+// ═══════════════════════════════
+// FETCH WRAPPER — selalu kirim cookie session
+// ═══════════════════════════════
+async function apiFetch(url, options = {}) {
+  return fetch(url, {
+    ...options,
+    credentials: 'include',
+  });
+}
+
+// ═══════════════════════════════
+// AUTH
+// ═══════════════════════════════
+async function doLogin() {
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!user || !pass) return toast('Isi username dan password', 'error');
+
+  const res = await apiFetch(`${API}/login.php`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({username:user, password:pass})
+  });
+  const data = await res.json();
+  if (data.success) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-nama').textContent = data.data.admin.nama;
+    document.getElementById('admin-avatar').textContent = data.data.admin.nama[0].toUpperCase();
+    loadDashboard();
+  } else {
+    toast(data.message, 'error');
+  }
+}
+
+async function doLogout() {
+  await apiFetch(`${API}/logout.php`, {method:'POST'});
+  location.reload();
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ═══════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════
+const pages = {
+  dashboard: { title:'📊 Beranda', sub:'Grafik & statistik pemilihan' },
+  paslon:    { title:'👥 Data Paslon', sub:'Kelola pasangan calon ketua OSIS' },
+  users:     { title:'🎓 Data Pemilih', sub:'Kelola akun siswa pemilih' },
+  pengaturan:{ title:'⚙️ Pengaturan', sub:'Konfigurasi sistem voting' },
+};
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelector(`[onclick="showPage('${id}')"]`).classList.add('active');
+  document.getElementById('page-title').textContent = pages[id].title;
+  document.getElementById('page-subtitle').textContent = pages[id].sub;
+
+  if (id === 'dashboard')  loadDashboard();
+  if (id === 'paslon')     loadPaslon();
+  if (id === 'users')      { userPage = 1; loadUsers(); }
+  if (id === 'pengaturan') loadPengaturan();
+}
+
+// ═══════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════
+const PASLON_COLORS = [
+  ['#4f8ef7','#3b72d4'], ['#7c3aed','#6129c4'], ['#22c55e','#16a34a'],
+  ['#f59e0b','#d97706'], ['#ef4444','#dc2626'],
+];
+
+async function loadDashboard() {
+  const res  = await apiFetch(`${API}/dashboard.php`);
+  const data = await res.json();
+  if (!data.success) return toast(data.message, 'error');
+  const d = data.data;
+
+  document.getElementById('nama-sekolah').textContent = d.pengaturan?.nama_sekolah || '';
+
+  const badge = document.getElementById('voting-status');
+  if (d.pengaturan?.voting_aktif === '1') {
+    badge.textContent = '● Voting Aktif';
+    badge.className = 'badge-aktif on';
+  } else {
+    badge.textContent = '● Voting Nonaktif';
+    badge.className = 'badge-aktif off';
+  }
+
+  document.getElementById('stat-cards').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(79,142,247,.15)">👥</div>
+      <div><div class="stat-value">${d.total_pemilih}</div><div class="stat-label">Total Pemilih</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(34,197,94,.15)">✅</div>
+      <div><div class="stat-value" style="color:var(--green)">${d.sudah_memilih}</div><div class="stat-label">Sudah Memilih</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(239,68,68,.15)">⏳</div>
+      <div><div class="stat-value" style="color:var(--red)">${d.belum_memilih}</div><div class="stat-label">Belum Memilih</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(245,158,11,.15)">📈</div>
+      <div><div class="stat-value" style="color:var(--yellow)">${d.partisipasi}%</div><div class="stat-label">Partisipasi</div></div>
+    </div>
+  `;
+
+  const labels   = d.hasil_per_paslon.map(p => `Paslon ${p.nomor_urut}`);
+  const suara    = d.hasil_per_paslon.map(p => parseInt(p.jumlah_suara));
+  const names    = d.hasil_per_paslon.map(p => p.nama_paslon);
+  const bgColors = d.hasil_per_paslon.map((_, i) => PASLON_COLORS[i % PASLON_COLORS.length][0]);
+
+  renderChart('chartBar', 'bar', {
+    labels,
+    datasets: [{
+      label: 'Jumlah Suara',
+      data: suara,
+      backgroundColor: bgColors,
+      borderRadius: 8,
+    }]
+  }, {
+    plugins: { legend: {display:false}, tooltip: { callbacks: { label: (c) => ` ${c.raw} suara — ${names[c.dataIndex]}` } } },
+    scales: { y: { beginAtZero:true, ticks:{color:'#64748b'}, grid:{color:'#2e3347'} }, x:{ticks:{color:'#64748b'}, grid:{color:'#2e3347'}} }
+  });
+
+  renderChart('chartDoughnut', 'doughnut', {
+    labels: names,
+    datasets: [{ data: suara, backgroundColor: bgColors, borderWidth: 0, hoverOffset: 8 }]
+  }, {
+    plugins: { legend: { position:'bottom', labels:{color:'#e2e8f0', boxWidth:12, padding:16} } },
+    cutout: '65%'
+  });
+
+  renderChart('chartProgress', 'bar', {
+    labels: ['Pemilih'],
+    datasets: [
+      { label:'Sudah', data:[d.sudah_memilih], backgroundColor:'#22c55e', borderRadius:6, stack:'a' },
+      { label:'Belum', data:[d.belum_memilih], backgroundColor:'#ef4444', borderRadius:6, stack:'a' },
+    ]
+  }, {
+    indexAxis: 'y',
+    plugins: { legend: { labels:{color:'#e2e8f0'} } },
+    scales: { x:{ticks:{color:'#64748b'}, grid:{color:'#2e3347'}}, y:{ticks:{color:'#64748b'}, grid:{display:false}} }
+  });
+
+  const jamLabels = Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}:00`);
+  const jamData   = jamLabels.map((_, i) => {
+    const found = (d.voting_per_jam || []).find(j => parseInt(j.jam) === i);
+    return found ? parseInt(found.jumlah) : 0;
+  });
+  renderChart('chartLine', 'line', {
+    labels: jamLabels,
+    datasets: [{
+      label: 'Suara masuk',
+      data: jamData,
+      borderColor: '#4f8ef7',
+      backgroundColor: 'rgba(79,142,247,.15)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 3,
+    }]
+  }, {
+    plugins: { legend:{display:false} },
+    scales: {
+      x:{ticks:{color:'#64748b', maxTicksLimit:8}, grid:{color:'#2e3347'}},
+      y:{beginAtZero:true, ticks:{color:'#64748b'}, grid:{color:'#2e3347'}}
+    }
+  });
+}
+
+function renderChart(id, type, chartData, opts) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id).getContext('2d');
+  charts[id] = new Chart(ctx, {
+    type,
+    data: chartData,
+    options: { responsive:true, maintainAspectRatio:false, color:'#e2e8f0', ...opts }
+  });
+}
+
+// ═══════════════════════════════
+// PASLON
+// ═══════════════════════════════
+async function loadPaslon() {
+  const res  = await apiFetch(`${API}/paslon.php`);
+  const data = await res.json();
+  const wrap = document.getElementById('paslon-table-wrap');
+  if (!data.success) return wrap.innerHTML = `<div class="loading">Gagal memuat data</div>`;
+
+  const paslon = data.data.paslon;
+  if (!paslon.length) {
+    wrap.innerHTML = `<div class="loading">Belum ada data paslon</div>`;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>No</th><th>Foto</th><th>Paslon</th><th>Visi</th><th>Suara</th><th>Aksi</th>
+      </tr></thead>
+      <tbody>
+        ${paslon.map(p => `
+          <tr>
+            <td><span class="chip chip-blue">#${p.nomor_urut}</span></td>
+            <td><img src="${p.foto_url}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.nama_paslon)}&background=222636&color=4f8ef7'" style="width:48px;height:48px;border-radius:10px;object-fit:cover"></td>
+            <td>
+              <div style="font-weight:600">${p.nama_paslon}</div>
+            </td>
+            <td style="max-width:200px;color:var(--muted);font-size:12px">${(p.visi||'').substring(0,80)}...</td>
+            <td><span class="chip chip-green">${p.jumlah_suara || 0} suara</span></td>
+            <td style="display:flex;gap:6px">
+              <button class="btn btn-primary btn-sm" onclick="editPaslon(${p.id})">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deletePaslon(${p.id}, '${p.nama_paslon}')">Hapus</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function openModalPaslon(data = null) {
+  document.getElementById('paslon-id').value = data?.id || '';
+  document.getElementById('paslon-nomor').value = data?.nomor_urut || '';
+  document.getElementById('paslon-ketua').value = data?.nama_ketua || '';
+  document.getElementById('paslon-wakil').value = data?.nama_wakil || '';
+  document.getElementById('paslon-visi').value = data?.visi || '';
+  document.getElementById('paslon-misi').value = data?.misi || '';
+  document.getElementById('paslon-foto').value = '';
+  document.getElementById('modal-paslon-title').textContent = data ? 'Edit Paslon' : 'Tambah Paslon';
+  const preview = document.getElementById('paslon-foto-preview');
+  if (data?.foto_url) {
+    preview.outerHTML = `<img id="paslon-foto-preview" class="foto-preview" src="${data.foto_url}" onerror="this.style.display='none'">`;
+  } else {
+    if (document.getElementById('paslon-foto-preview').tagName === 'IMG') {
+      document.getElementById('paslon-foto-preview').outerHTML = `<div id="paslon-foto-preview" class="foto-placeholder">📷</div>`;
+    }
+  }
+  document.getElementById('modal-paslon').classList.add('open');
+}
+
+async function editPaslon(id) {
+  const res  = await apiFetch(`${API}/paslon.php?id=${id}`);
+  const data = await res.json();
+  if (data.success) openModalPaslon(data.data.paslon);
+}
+
+async function savePaslon() {
+  const id = document.getElementById('paslon-id').value;
+  const fd = new FormData();
+  fd.append('nomor_urut', document.getElementById('paslon-nomor').value);
+  fd.append('nama_ketua', document.getElementById('paslon-ketua').value);
+  fd.append('nama_wakil', document.getElementById('paslon-wakil').value);
+  fd.append('visi',       document.getElementById('paslon-visi').value);
+  fd.append('misi',       document.getElementById('paslon-misi').value);
+  const fotoFile = document.getElementById('paslon-foto').files[0];
+  if (fotoFile) fd.append('foto', fotoFile);
+
+  const url    = id ? `${API}/paslon.php?id=${id}` : `${API}/paslon.php`;
+  const method = id ? 'PUT' : 'POST';
+
+  const res  = await apiFetch(url, { method, body: fd });
+  const data = await res.json();
+  if (data.success) {
+    toast(data.message, 'success');
+    closeModal('modal-paslon');
+    loadPaslon();
+  } else {
+    toast(data.message, 'error');
+  }
+}
+
+async function deletePaslon(id, nama) {
+  if (!confirm(`Hapus paslon "${nama}"? Data ini tidak dapat dikembalikan.`)) return;
+  const res  = await apiFetch(`${API}/paslon.php?id=${id}`, { method:'DELETE' });
+  const data = await res.json();
+  if (data.success) { toast('Paslon dihapus', 'success'); loadPaslon(); }
+  else toast(data.message, 'error');
+}
+
+function previewFoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('paslon-foto-preview').outerHTML = `<img id="paslon-foto-preview" class="foto-preview" src="${e.target.result}">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ═══════════════════════════════
+// USERS
+// ═══════════════════════════════
+async function loadUsers() {
+  const params = new URLSearchParams({
+    page: userPage, limit: 15, search: userSearch, kelas: userKelas, status: userStatus
+  });
+  const res  = await apiFetch(`${API}/users.php?${params}`);
+  const data = await res.json();
+  const wrap = document.getElementById('users-table-wrap');
+
+  if (!data.success) return wrap.innerHTML = `<div class="loading">Gagal memuat</div>`;
+
+  const { users, total, total_page, daftar_kelas } = data.data;
+
+  if (daftar_kelas?.length && !kelasOptions.length) {
+    kelasOptions = daftar_kelas;
+    const sel = document.getElementById('filter-kelas');
+    daftar_kelas.forEach(k => {
+      const opt = document.createElement('option');
+      opt.value = k; opt.textContent = k;
+      sel.appendChild(opt);
+    });
+  }
+
+  if (!users.length) {
+    wrap.innerHTML = `<div class="loading">Tidak ada data ditemukan</div>`;
+    document.getElementById('users-pagination').innerHTML = '';
+    return;
+  }
+
+  wrap.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>#</th><th>Nama</th><th>NISN</th><th>Kelas</th><th>Status</th><th>Pilihan</th><th>Waktu</th><th>Aksi</th>
+      </tr></thead>
+      <tbody>
+        ${users.map((u,i) => `
+          <tr>
+            <td style="color:var(--muted)">${((userPage-1)*15)+i+1}</td>
+            <td style="font-weight:600">${u.nama}</td>
+            <td style="font-family:monospace;color:var(--muted)">${u.nisn}</td>
+            <td><span class="chip chip-blue">${u.kelas}</span></td>
+            <td><span class="chip ${u.sudah_memilih?'chip-green':'chip-red'}">${u.sudah_memilih?'✓ Sudah':'○ Belum'}</span></td>
+            <td style="font-size:12px;color:var(--muted)">${u.paslon_nama||'—'}</td>
+            <td style="font-size:11px;color:var(--muted)">${u.waktu_memilih ? u.waktu_memilih.replace('T',' ').substring(0,16) : '—'}</td>
+            <td style="display:flex;gap:4px;flex-wrap:wrap">
+              <button class="btn btn-primary btn-sm" onclick="editUser(${u.id})">Edit</button>
+              ${u.sudah_memilih ? `<button class="btn btn-sm" style="border:1px solid var(--yellow);color:var(--yellow)" onclick="resetVote(${u.id},'${u.nama}')">Reset</button>` : ''}
+              <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id},'${u.nama}')">Hapus</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+
+  const pag = document.getElementById('users-pagination');
+  pag.innerHTML = `
+    <div class="page-info">Total: ${total} user | Halaman ${userPage} dari ${total_page}</div>
+    <button class="btn btn-sm" style="border:1px solid var(--border);background:none;color:var(--text)" ${userPage===1?'disabled':''} onclick="changePage(${userPage-1})">‹ Prev</button>
+    <button class="btn btn-sm" style="border:1px solid var(--border);background:none;color:var(--text)" ${userPage>=total_page?'disabled':''} onclick="changePage(${userPage+1})">Next ›</button>
+  `;
+}
+
+function changePage(p) { userPage = p; loadUsers(); }
+
+function filterUsers() {
+  userPage   = 1;
+  userSearch = document.getElementById('search-user').value;
+  userKelas  = document.getElementById('filter-kelas').value;
+  userStatus = document.getElementById('filter-status').value;
+  loadUsers();
+}
+
+function openModalUser(data = null) {
+  document.getElementById('user-id').value = data?.id || '';
+  document.getElementById('user-nama').value = data?.nama || '';
+  document.getElementById('user-nisn').value = data?.nisn || '';
+  document.getElementById('user-kelas').value = data?.kelas || '';
+  document.getElementById('user-password').value = '';
+  document.getElementById('modal-user-title').textContent = data ? 'Edit Pemilih' : 'Tambah Pemilih';
+  document.getElementById('user-pass-hint').style.display = data ? 'inline' : 'none';
+  document.getElementById('modal-user').classList.add('open');
+}
+
+async function editUser(id) {
+  const res  = await apiFetch(`${API}/users.php?id=${id}`);
+  const data = await res.json();
+  if (data.success) openModalUser(data.data.user);
+}
+
+async function saveUser() {
+  const id   = document.getElementById('user-id').value;
+  const body = {
+    nama:     document.getElementById('user-nama').value,
+    nisn:     document.getElementById('user-nisn').value,
+    kelas:    document.getElementById('user-kelas').value,
+    password: document.getElementById('user-password').value,
+  };
+  const url    = id ? `${API}/users.php?id=${id}` : `${API}/users.php`;
+  const method = id ? 'PUT' : 'POST';
+  const res  = await apiFetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  const data = await res.json();
+  if (data.success) { toast(data.message, 'success'); closeModal('modal-user'); loadUsers(); }
+  else toast(data.message, 'error');
+}
+
+async function resetVote(id, nama) {
+  if (!confirm(`Reset suara "${nama}"? Siswa akan bisa memilih lagi.`)) return;
+  const res  = await apiFetch(`${API}/users.php?action=reset_vote&id=${id}`, { method:'POST' });
+  const data = await res.json();
+  if (data.success) { toast('Suara direset', 'success'); loadUsers(); }
+  else toast(data.message, 'error');
+}
+
+async function deleteUser(id, nama) {
+  if (!confirm(`Hapus user "${nama}"?`)) return;
+  const res  = await apiFetch(`${API}/users.php?id=${id}`, { method:'DELETE' });
+  const data = await res.json();
+  if (data.success) { toast('User dihapus', 'success'); loadUsers(); }
+  else toast(data.message, 'error');
+}
+
+// ═══════════════════════════════
+// PENGATURAN
+// ═══════════════════════════════
+async function loadPengaturan() {
+  const res  = await apiFetch(`${API}/pengaturan.php`);
+  const data = await res.json();
+  if (!data.success) return;
+  const p = data.data.pengaturan;
+
+  document.getElementById('form-pengaturan').innerHTML = `
+    <div class="form-group">
+      <label>Nama Sekolah</label>
+      <input type="text" id="set-sekolah" value="${p.nama_sekolah||''}">
+    </div>
+    <div class="form-group">
+      <label>Tahun Ajaran</label>
+      <input type="text" id="set-tahun" value="${p.tahun_ajaran||''}">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tanggal Mulai</label>
+        <input type="date" id="set-mulai" value="${p.tanggal_mulai||''}">
+      </div>
+      <div class="form-group">
+        <label>Tanggal Selesai</label>
+        <input type="date" id="set-selesai" value="${p.tanggal_selesai||''}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Status Voting</label>
+      <select id="set-aktif">
+        <option value="1" ${p.voting_aktif==='1'?'selected':''}>✅ Aktif (Siswa bisa memilih)</option>
+        <option value="0" ${p.voting_aktif!=='1'?'selected':''}>🔒 Nonaktif (Voting ditutup)</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;padding-top:4px">
+      <button class="btn btn-primary" onclick="savePengaturan()">💾 Simpan Pengaturan</button>
+      <a href="../api/admin/export.php?type=hasil" class="btn btn-success">⬇ Export Hasil</a>
+    </div>
+  `;
+}
+
+async function savePengaturan() {
+  const body = {
+    nama_sekolah:    document.getElementById('set-sekolah').value,
+    tahun_ajaran:    document.getElementById('set-tahun').value,
+    tanggal_mulai:   document.getElementById('set-mulai').value,
+    tanggal_selesai: document.getElementById('set-selesai').value,
+    voting_aktif:    document.getElementById('set-aktif').value,
+  };
+  const res  = await apiFetch(`${API}/pengaturan.php`, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
+  });
+  const data = await res.json();
+  if (data.success) { toast('Pengaturan disimpan', 'success'); loadDashboard(); }
+  else toast(data.message, 'error');
+}
+
+// ═══════════════════════════════
+// MODAL HELPERS
+// ═══════════════════════════════
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+// ═══════════════════════════════
+// TOAST
+// ═══════════════════════════════
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast-item ${type}`;
+  el.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+</script>
+</body>
+</html>

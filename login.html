@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title>Login – Calon Ketua OSIS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      :root { --cream:#f0ece2; --navy:#1a2340; --navy-mid:#2a3558; --text-dark:#1a1a2e; --text-mid:#3a3a4a; }
+      html, body { width:100%; min-height:100vh; display:flex; justify-content:center; align-items:flex-start; background:var(--cream); font-family:"Lato",sans-serif; }
+      .phone { position:relative; width:390px; min-height:844px; background:var(--cream); overflow:hidden; }
+      .phone::after { content:""; position:absolute; inset:0; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"); pointer-events:none; z-index:10; }
+      .star { position:absolute; pointer-events:none; z-index:5; }
+      .star-2 { top:205px; left:28px; width:46px; transform:rotate(15deg); }
+      .star-5 { bottom:130px; right:-12px; width:60px; transform:rotate(-10deg); }
+      .header { position:relative; z-index:6; width:100%; padding:52px 28px 14px; display:flex; align-items:center; justify-content:space-between; }
+      .header-text { display:flex; flex-direction:column; }
+      .calon-label { font-weight:300; font-size:13px; letter-spacing:.12em; color:var(--navy); text-transform:uppercase; }
+      .osis-title { font-family:"Playfair Display",serif; font-weight:900; font-size:62px; line-height:.92; color:var(--navy); }
+      .divider-row { display:flex; align-items:center; gap:8px; margin-top:6px; }
+      .divider-line { height:1.5px; width:54px; background:var(--navy); }
+      .tahun-label { font-weight:400; font-size:10px; letter-spacing:.2em; color:var(--navy); text-transform:uppercase; margin-top:5px; }
+      .header-logo { width:96px; height:96px; flex-shrink:0; }
+      .header-logo img { width:100%; height:100%; object-fit:contain; }
+      .clipboard-section { position:relative; width:390px; height:614px; margin-top:4px; z-index:2; }
+      .clipboard-img { position:absolute; top:0; left:0; width:390px; height:614px; pointer-events:none; z-index:1; }
+      .form-overlay { position:absolute; top:110px; left:59px; width:276px; height:380px; z-index:3; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px 18px 16px; }
+      .card-title { font-family:"Playfair Display",serif; font-weight:400; font-size:32px; color:var(--text-dark); text-align:center; margin-bottom:4px; }
+      .card-underline { width:70px; height:1.5px; background:var(--text-dark); margin:0 auto 10px; border-radius:2px; }
+      .card-subtitle { font-weight:400; font-size:13.5px; color:var(--text-mid); text-align:center; line-height:1.5; margin-bottom:16px; width:100%; }
+      .form-group { margin-bottom:11px; width:100%; }
+      .form-label { display:block; font-weight:700; font-size:12px; color:var(--text-dark); letter-spacing:.04em; margin-bottom:5px; }
+      .input-wrap { display:flex; align-items:center; gap:8px; border:1.5px solid rgba(180,170,155,.9); border-radius:6px; background:rgba(255,255,255,.8); padding:9px 12px; transition:border-color .2s; }
+      .input-wrap:focus-within { border-color:var(--navy-mid); background:rgba(255,255,255,.95); }
+      .input-icon { color:#888; flex-shrink:0; display:flex; align-items:center; }
+      .input-field { border:none; outline:none; background:transparent; font-family:"Lato",sans-serif; font-size:13px; color:var(--text-dark); flex:1; min-width:0; }
+      .input-field::placeholder { color:#b0a898; font-weight:300; }
+      .btn-masuk { width:100%; padding:12px; margin-top:6px; background:var(--navy); color:#fff; font-family:"Lato",sans-serif; font-weight:700; font-size:14px; letter-spacing:.08em; border:none; border-radius:6px; cursor:pointer; transition:background .2s,transform .1s; display:flex; align-items:center; justify-content:center; gap:8px; }
+      .btn-masuk:hover { background:var(--navy-mid); }
+      .btn-masuk:active { transform:scale(.985); }
+      .btn-masuk:disabled { opacity:.6; cursor:not-allowed; }
+      .spinner-sm { width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; display:none; }
+      @keyframes spin { to { transform:rotate(360deg); } }
+    </style>
+  </head>
+  <body>
+    <div class="phone">
+      <img src="source/image/bintang.png" class="star star-2" alt="">
+      <img src="source/image/bintang.png" class="star star-5" alt="">
+
+      <div class="header">
+        <div class="header-text">
+          <span class="calon-label">Calon Ketua</span>
+          <span class="osis-title">OSIS</span>
+          <div class="divider-row">
+            <div class="divider-line"></div>
+            <svg width="10" height="10" viewBox="0 0 10 10"><polygon points="5,0.5 6.2,3.8 9.8,3.8 7,5.9 8.1,9.2 5,7.2 1.9,9.2 3,5.9 0.2,3.8 3.8,3.8" fill="#1a2340"/></svg>
+            <div class="divider-line"></div>
+          </div>
+          <span class="tahun-label">Tahun Ajaran 2025/2026</span>
+        </div>
+        <div class="header-logo"><img src="source/image/logobbc.png" alt="Logo Sekolah"></div>
+      </div>
+
+      <div class="clipboard-section">
+        <img class="clipboard-img" src="source/image/kertas.png" alt="clipboard">
+        <div class="form-overlay">
+          <h1 class="card-title">Login</h1>
+          <div class="card-underline"></div>
+          <p class="card-subtitle">Masuk untuk memberikan<br>suara anda.</p>
+
+          <div class="form-group">
+            <label class="form-label">NISN</label>
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </span>
+              <input id="inp-nisn" class="input-field" type="text" placeholder="Masukan NISN Anda" autocomplete="off" inputmode="numeric">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              </span>
+              <input id="inp-password" class="input-field" type="password" placeholder="Masukan password Anda" autocomplete="off">
+            </div>
+          </div>
+
+          <button class="btn-masuk" id="btn-login" onclick="doLogin()">
+            <div class="spinner-sm" id="spinner"></div>
+            <span id="btn-text">Masuk</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="source/js/api.js"></script>
+    <script>
+      // Sudah login? langsung ke beranda
+      if (getSession()) window.location.href = 'beranda.html';
+
+      async function doLogin() {
+        const nisn     = document.getElementById('inp-nisn').value.trim();
+        const password = document.getElementById('inp-password').value;
+        if (!nisn || !password) { showToast('NISN dan password wajib diisi', 'error'); return; }
+
+        const btn     = document.getElementById('btn-login');
+        const spinner = document.getElementById('spinner');
+        const txt     = document.getElementById('btn-text');
+        btn.disabled = true; spinner.style.display = 'block'; txt.textContent = 'Memproses...';
+
+        try {
+          const data = await apiLogin(nisn, password);
+          if (data.success) {
+            setSession(data.data.user);
+            showToast('Login berhasil!', 'success');
+            setTimeout(() => window.location.href = 'beranda.html', 700);
+          } else {
+            showToast(data.message || 'Login gagal', 'error');
+            btn.disabled = false; spinner.style.display = 'none'; txt.textContent = 'Masuk';
+          }
+        } catch {
+          showToast('Gagal terhubung ke server', 'error');
+          btn.disabled = false; spinner.style.display = 'none'; txt.textContent = 'Masuk';
+        }
+      }
+
+      document.getElementById('inp-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+      document.getElementById('inp-nisn').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-password').focus(); });
+    </script>
+  </body>
+</html>
