@@ -176,4 +176,4 @@ const vote = await fetch('/osis-voting/api/frontend/vote.php', {
 
 **CORS Error dari frontend**
 → Tambahkan domain frontend ke `setCorsHeaders()` di `helpers.php`
-# Voting-osis
+# osis-voting
