@@ -3,7 +3,7 @@
  * Include file ini di semua halaman HTML frontend
  */
 
-const API_BASE = 'api/frontend';
+const API_BASE = '/api/frontend';
 
 // ═══════════════════════════════════════════
 // SESSION / AUTH HELPERS
