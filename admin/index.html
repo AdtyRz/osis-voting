@@ -620,7 +620,7 @@ const PASLON_COLORS = [
 ];
 
 async function loadDashboard() {
-  const res  = await apiFetch(`${API}/dashboard.php`);
+  const res  = await apiFetch(`${API}/realtime.php`);
   const data = await res.json();
   if (!data.success) return toast(data.message, 'error');
   const d = data.data;
@@ -668,8 +668,8 @@ async function loadDashboard() {
   `;
 
   const labels   = d.hasil_per_paslon.map(p => `Paslon ${p.nomor_urut}`);
-  const suara    = d.hasil_per_paslon.map(p => parseInt(p.jumlah_suara));
-  const names    = d.hasil_per_paslon.map(p => p.nama_paslon);
+  const suara    = d.hasil_per_paslon.map(p => p.suara);
+  const names    = d.hasil_per_paslon.map(p => `${p.nama_ketua} & ${p.nama_wakil}`);
   const bgColors = d.hasil_per_paslon.map((_, i) => PASLON_COLORS[i % PASLON_COLORS.length][0]);
 
   renderChart('chartBar', 'bar', {
@@ -781,11 +781,10 @@ async function loadDashboard() {
     }
   });
 
-  const jamLabels = Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}:00`);
-  const jamData   = jamLabels.map((_, i) => {
-    const found = (d.voting_per_jam || []).find(j => parseInt(j.jam) === i);
-    return found ? parseInt(found.jumlah) : 0;
-  });
+  // Chart voting per jam - format baru dari realtime.php (jam 7-17)
+  const jamLabels = (d.voting_per_jam || []).map(j => `${String(j.jam).padStart(2,'0')}:00`);
+  const jamData   = (d.voting_per_jam || []).map(j => j.jumlah);
+  
   renderChart('chartLine', 'line', {
     labels: jamLabels,
     datasets: [{
@@ -876,15 +875,15 @@ async function loadPaslon() {
         ${paslon.map(p => `
           <tr>
             <td><span class="chip chip-blue">#${p.nomor_urut}</span></td>
-            <td><img src="${p.foto_url}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.nama_paslon)}&background=222636&color=4f8ef7'" style="width:48px;height:48px;border-radius:10px;object-fit:cover"></td>
+            <td><img src="${p.foto_url}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(`${p.nama_ketua} & ${p.nama_wakil}`)}&background=222636&color=4f8ef7'" style="width:48px;height:48px;border-radius:10px;object-fit:cover"></td>
             <td>
-              <div style="font-weight:600">${p.nama_paslon}</div>
+              <div style="font-weight:600">${`${p.nama_ketua} & ${p.nama_wakil}`}</div>
             </td>
             <td style="max-width:200px;color:var(--muted);font-size:12px">${(p.visi||'').substring(0,80)}...</td>
-            <td><span class="chip chip-green">${p.jumlah_suara || 0} suara</span></td>
+            <td><span class="chip chip-green">${p.total_suara || 0} suara</span></td>
             <td style="display:flex;gap:6px">
               <button class="btn btn-primary btn-sm" onclick="editPaslon(${p.id})">Edit</button>
-              <button class="btn btn-danger btn-sm" onclick="deletePaslon(${p.id}, '${p.nama_paslon}')">Hapus</button>
+              <button class="btn btn-danger btn-sm" onclick="deletePaslon(${p.id}, '${`${p.nama_ketua} & ${p.nama_wakil}`}')">Hapus</button>
             </td>
           </tr>
         `).join('')}
