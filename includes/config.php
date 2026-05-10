@@ -4,7 +4,7 @@
 // Sesuaikan dengan setting server kamu
 // =============================================
 
-define('DB_HOST', 'localhost');
+define('DB_HOST', '127.0.0.1');
 define('DB_USER', 'root');        // Ganti dengan username MySQL kamu
 define('DB_PASS', '');             // Ganti dengan password MySQL kamu
 define('DB_NAME', 'db_osis_voting');
