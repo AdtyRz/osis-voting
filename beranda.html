@@ -161,7 +161,8 @@
 
         // Tombol pilih (hanya tampil jika belum memilih)
         const btnPilih = sudahMemilih ? '' : `
-          `;
+          <button class="btn-pilih" onclick="pilihPaslon(${p.id})">🗳️ Pilih Paslon ${noLabel}</button>
+        `;
 
         html += `
           <div class="card" id="card-${p.id}">
@@ -270,6 +271,11 @@
         document.getElementById('cards-container').innerHTML = `<p style="text-align:center;color:#c0392b;padding:20px">Gagal memuat data. Cek koneksi.</p>`;
       }
     }
+
+    // Auto refresh setiap 5 detik untuk realtime update
+    setInterval(() => {
+      if (!user.sudah_memilih) loadPaslon();
+    }, 5000);
 
     loadPaslon();
   </script>
