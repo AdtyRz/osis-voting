@@ -439,12 +439,14 @@ async function doLogin() {
     document.getElementById('admin-nama').textContent = data.data.admin.nama;
     document.getElementById('admin-avatar').textContent = data.data.admin.nama[0].toUpperCase();
     loadDashboard();
+    startRealtime(); // Mulai realtime refresh
   } else {
     toast(data.message, 'error');
   }
 }
 
 async function doLogout() {
+  stopRealtime();
   await apiFetch(`${API}/logout.php`, {method:'POST'});
   location.reload();
 }
@@ -906,6 +908,40 @@ function toast(msg, type = 'success') {
   document.getElementById('toast').appendChild(el);
   setTimeout(() => el.remove(), 3500);
 }
+
+// ═══════════════════════════════
+// REALTIME REFRESH
+// ═══════════════════════════════
+let realtimeInterval = null;
+
+function startRealtime() {
+  // Refresh setiap 5 detik untuk data realtime
+  if (realtimeInterval) clearInterval(realtimeInterval);
+  realtimeInterval = setInterval(() => {
+    const activePage = document.querySelector('.page.active').id.replace('page-', '');
+    if (activePage === 'dashboard') loadDashboard();
+    if (activePage === 'paslon') loadPaslon();
+    if (activePage === 'users') loadUsers();
+  }, 5000);
+}
+
+function stopRealtime() {
+  if (realtimeInterval) {
+    clearInterval(realtimeInterval);
+    realtimeInterval = null;
+  }
+}
+
+// Update showPage untuk handle realtime
+const originalShowPage = showPage;
+showPage = function(id) {
+  originalShowPage(id);
+  // Restart interval agar sesuai halaman aktif
+  if (realtimeInterval) {
+    clearInterval(realtimeInterval);
+    startRealtime();
+  }
+};
 </script>
 </body>
 </html>
