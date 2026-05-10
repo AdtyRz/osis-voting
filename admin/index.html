@@ -63,11 +63,27 @@
   .btn-logout:hover { background:rgba(239,68,68,.1); }
 
   /* ── Main Content ── */
-  .main { margin-left:240px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
+  .main { 
+    margin-left:240px; 
+    flex:1; 
+    display:flex; 
+    flex-direction:column; 
+    min-height:100vh;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
   .topbar {
-    padding:16px 28px; border-bottom:1px solid var(--border);
-    background:var(--surface); display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; z-index:50;
+    padding:16px 28px; 
+    border-bottom:1px solid var(--border);
+    background:var(--surface); 
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between;
+    position:sticky; 
+    top:0; 
+    z-index:50;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   }
   .topbar h1 { font-size:18px; font-weight:700; }
   .topbar .subtitle { font-size:12px; color:var(--muted); margin-top:2px; }
@@ -75,7 +91,11 @@
   .badge-aktif.on { background:rgba(34,197,94,.15); color:var(--green); }
   .badge-aktif.off { background:rgba(239,68,68,.15); color:var(--red); }
 
-  .content { padding:28px; flex:1; }
+  .content { 
+    padding:28px; 
+    flex:1; 
+    overflow-y: auto;
+  }
 
   /* ── Pages ── */
   .page { display:none; }
@@ -84,8 +104,19 @@
   /* ── Stat Cards ── */
   .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
   .stat-card {
-    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
-    padding:20px; display:flex; align-items:center; gap:16px;
+    background:var(--surface); 
+    border:1px solid var(--border); 
+    border-radius:var(--radius);
+    padding:20px; 
+    display:flex; 
+    align-items:center; 
+    gap:16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
   }
   .stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
   .stat-value { font-size:26px; font-weight:800; line-height:1; }
@@ -93,27 +124,125 @@
 
   /* ── Charts ── */
   .charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px; }
-  .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
-  .chart-card h3 { font-size:14px; font-weight:700; margin-bottom:16px; color:var(--text); }
-  .chart-wrap { position:relative; height:240px; }
+  .chart-card { 
+    background:var(--surface); 
+    border:1px solid var(--border); 
+    border-radius:var(--radius); 
+    padding:20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .chart-card:hover { 
+    transform: translateY(-3px); 
+    box-shadow: 0 8px 30px rgba(79,142,247,0.15);
+  }
+  .chart-card h3 { 
+    font-size:14px; 
+    font-weight:700; 
+    margin-bottom:16px; 
+    color:var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chart-card h3::before {
+    content: '';
+    width: 4px;
+    height: 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+  }
+  .chart-wrap { position:relative; height:280px; }
+  
+  /* Realtime indicator */
+  .realtime-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(34,197,94,0.1);
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--green);
+    margin-left: auto;
+  }
+  .realtime-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+  }
 
   /* ── Table ── */
-  .table-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .table-card { 
+    background:var(--surface); 
+    border:1px solid var(--border); 
+    border-radius:var(--radius); 
+    overflow:hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
   .table-toolbar { padding:16px 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
   .table-toolbar h3 { font-size:14px; font-weight:700; flex:1; }
   .inp { padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:13px; outline:none; }
   .inp:focus { border-color:var(--accent); }
-  .btn { padding:8px 16px; border-radius:8px; border:none; font-size:13px; font-weight:600; cursor:pointer; transition:.15s; }
-  .btn-primary { background:var(--accent); color:#fff; }
-  .btn-primary:hover { opacity:.85; }
-  .btn-success { background:var(--green); color:#fff; }
-  .btn-success:hover { opacity:.85; }
-  .btn-danger { background:transparent; border:1px solid var(--red); color:var(--red); }
-  .btn-danger:hover { background:rgba(239,68,68,.1); }
+  .btn { 
+    padding:8px 16px; 
+    border-radius:10px; 
+    border:none; 
+    font-size:13px; 
+    font-weight:600; 
+    cursor:pointer; 
+    transition:all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary { 
+    background: linear-gradient(135deg, var(--accent), var(--accent2)); 
+    color:#fff;
+    box-shadow: 0 2px 8px rgba(79,142,247,0.3);
+  }
+  .btn-primary:hover { 
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(79,142,247,0.4);
+  }
+  .btn-success { 
+    background:var(--green); 
+    color:#fff;
+    box-shadow: 0 2px 8px rgba(34,197,94,0.3);
+  }
+  .btn-success:hover { 
+    opacity:.85;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(34,197,94,0.4);
+  }
+  .btn-danger { 
+    background:transparent; 
+    border:1px solid var(--red); 
+    color:var(--red);
+  }
+  .btn-danger:hover { 
+    background:rgba(239,68,68,.1);
+    transform: translateY(-2px);
+  }
   .btn-sm { padding:5px 10px; font-size:12px; }
   table { width:100%; border-collapse:collapse; }
   th, td { padding:12px 16px; text-align:left; font-size:13px; }
-  th { background:var(--surface2); font-weight:600; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
+  th { 
+    background: linear-gradient(to right, var(--surface2), var(--surface)); 
+    font-weight:700; 
+    color:var(--muted); 
+    font-size:11px; 
+    text-transform:uppercase; 
+    letter-spacing:.08em;
+    padding: 14px 16px;
+  }
   tr:not(:last-child) td { border-bottom:1px solid var(--border); }
   tr:hover td { background:rgba(255,255,255,.02); }
   .chip { display:inline-flex; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
@@ -253,21 +382,21 @@
       </div>
       <div class="charts-grid">
         <div class="chart-card">
-          <h3>📊 Perolehan Suara Per Paslon</h3>
+          <h3>📊 Perolehan Suara Per Paslon <span class="realtime-badge"><span class="realtime-dot"></span>Live</span></h3>
           <div class="chart-wrap"><canvas id="chartBar"></canvas></div>
         </div>
         <div class="chart-card">
-          <h3>🍩 Distribusi Suara</h3>
+          <h3>🍩 Distribusi Suara <span class="realtime-badge"><span class="realtime-dot"></span>Live</span></h3>
           <div class="chart-wrap"><canvas id="chartDoughnut"></canvas></div>
         </div>
       </div>
       <div class="charts-grid">
         <div class="chart-card">
-          <h3>📈 Partisipasi Voting</h3>
+          <h3>📈 Partisipasi Voting <span class="realtime-badge"><span class="realtime-dot"></span>Live</span></h3>
           <div class="chart-wrap"><canvas id="chartProgress"></canvas></div>
         </div>
         <div class="chart-card">
-          <h3>⏱️ Voting Per Jam (Hari Ini)</h3>
+          <h3>⏱️ Voting Per Jam (Hari Ini) <span class="realtime-badge"><span class="realtime-dot"></span>Live</span></h3>
           <div class="chart-wrap"><canvas id="chartLine"></canvas></div>
         </div>
       </div>
@@ -477,6 +606,9 @@ function showPage(id) {
   if (id === 'paslon')     loadPaslon();
   if (id === 'users')      { userPage = 1; loadUsers(); }
   if (id === 'pengaturan') loadPengaturan();
+  
+  // Scroll to top on page change
+  document.querySelector('.main').scrollTop = 0;
 }
 
 // ═══════════════════════════════
@@ -506,20 +638,32 @@ async function loadDashboard() {
 
   document.getElementById('stat-cards').innerHTML = `
     <div class="stat-card">
-      <div class="stat-icon" style="background:rgba(79,142,247,.15)">👥</div>
-      <div><div class="stat-value">${d.total_pemilih}</div><div class="stat-label">Total Pemilih</div></div>
+      <div class="stat-icon" style="background:rgba(79,142,247,.15); color:var(--accent)">👥</div>
+      <div>
+        <div class="stat-value" style="color:var(--accent)">${d.total_pemilih}</div>
+        <div class="stat-label">Total Pemilih</div>
+      </div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon" style="background:rgba(34,197,94,.15)">✅</div>
-      <div><div class="stat-value" style="color:var(--green)">${d.sudah_memilih}</div><div class="stat-label">Sudah Memilih</div></div>
+      <div class="stat-icon" style="background:rgba(34,197,94,.15); color:var(--green)">✅</div>
+      <div>
+        <div class="stat-value" style="color:var(--green)">${d.sudah_memilih}</div>
+        <div class="stat-label">Sudah Memilih</div>
+      </div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon" style="background:rgba(239,68,68,.15)">⏳</div>
-      <div><div class="stat-value" style="color:var(--red)">${d.belum_memilih}</div><div class="stat-label">Belum Memilih</div></div>
+      <div class="stat-icon" style="background:rgba(239,68,68,.15); color:var(--red)">⏳</div>
+      <div>
+        <div class="stat-value" style="color:var(--red)">${d.belum_memilih}</div>
+        <div class="stat-label">Belum Memilih</div>
+      </div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon" style="background:rgba(245,158,11,.15)">📈</div>
-      <div><div class="stat-value" style="color:var(--yellow)">${d.partisipasi}%</div><div class="stat-label">Partisipasi</div></div>
+      <div class="stat-icon" style="background:rgba(245,158,11,.15); color:var(--yellow)">📈</div>
+      <div>
+        <div class="stat-value" style="color:var(--yellow)">${d.partisipasi}%</div>
+        <div class="stat-label">Partisipasi</div>
+      </div>
     </div>
   `;
 
@@ -533,32 +677,108 @@ async function loadDashboard() {
     datasets: [{
       label: 'Jumlah Suara',
       data: suara,
-      backgroundColor: bgColors,
-      borderRadius: 8,
+      backgroundColor: bgColors.map(c => c.replace(')', ', 0.85)').replace('rgb', 'rgba')),
+      borderRadius: 10,
+      borderSkipped: false,
     }]
   }, {
-    plugins: { legend: {display:false}, tooltip: { callbacks: { label: (c) => ` ${c.raw} suara — ${names[c.dataIndex]}` } } },
-    scales: { y: { beginAtZero:true, ticks:{color:'#64748b'}, grid:{color:'#2e3347'} }, x:{ticks:{color:'#64748b'}, grid:{color:'#2e3347'}} }
+    plugins: { 
+      legend: {display:false}, 
+      tooltip: { 
+        callbacks: { label: (c) => ` ${c.raw} suara — ${names[c.dataIndex]}` },
+        backgroundColor: 'rgba(15,17,23,0.95)',
+        titleColor: '#e2e8f0',
+        bodyColor: '#e2e8f0',
+        padding: 12,
+        displayColors: true,
+        cornerRadius: 8,
+      } 
+    },
+    scales: { 
+      y: { 
+        beginAtZero:true, 
+        ticks:{color:'#64748b', font:{size:11}}, 
+        grid:{color:'#2e3347', drawBorder:false} 
+      }, 
+      x:{
+        ticks:{color:'#64748b', font:{size:11}}, 
+        grid:{color:'#2e3347', drawBorder:false}
+      } 
+    }
   });
 
   renderChart('chartDoughnut', 'doughnut', {
     labels: names,
-    datasets: [{ data: suara, backgroundColor: bgColors, borderWidth: 0, hoverOffset: 8 }]
+    datasets: [{ 
+      data: suara, 
+      backgroundColor: bgColors.map(c => c.replace(')', ', 0.8)').replace('rgb', 'rgba')), 
+      borderWidth: 0, 
+      hoverOffset: 12,
+      hoverBorderColor: '#fff',
+    }]
   }, {
-    plugins: { legend: { position:'bottom', labels:{color:'#e2e8f0', boxWidth:12, padding:16} } },
-    cutout: '65%'
+    plugins: { 
+      legend: { 
+        position:'bottom', 
+        labels:{
+          color:'#e2e8f0', 
+          boxWidth:14, 
+          padding:16,
+          font: { size: 11, weight: 500 }
+        } 
+      },
+      tooltip: {
+        backgroundColor: 'rgba(15,17,23,0.95)',
+        titleColor: '#e2e8f0',
+        bodyColor: '#e2e8f0',
+        padding: 12,
+        cornerRadius: 8,
+        callbacks: {
+          label: (ctx) => {
+            const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
+            const pct = ((ctx.raw / total) * 100).toFixed(1);
+            return ` ${ctx.label}: ${ctx.raw} (${pct}%)`;
+          }
+        }
+      }
+    },
+    cutout: '60%',
+    circumference: 360,
   });
 
   renderChart('chartProgress', 'bar', {
     labels: ['Pemilih'],
     datasets: [
-      { label:'Sudah', data:[d.sudah_memilih], backgroundColor:'#22c55e', borderRadius:6, stack:'a' },
-      { label:'Belum', data:[d.belum_memilih], backgroundColor:'#ef4444', borderRadius:6, stack:'a' },
+      { label:'Sudah Memilih', data:[d.sudah_memilih], backgroundColor:'#22c55e', borderRadius:8, stack:'a', barThickness: 30 },
+      { label:'Belum Memilih', data:[d.belum_memilih], backgroundColor:'#ef4444', borderRadius:8, stack:'a', barThickness: 30 },
     ]
   }, {
     indexAxis: 'y',
-    plugins: { legend: { labels:{color:'#e2e8f0'} } },
-    scales: { x:{ticks:{color:'#64748b'}, grid:{color:'#2e3347'}}, y:{ticks:{color:'#64748b'}, grid:{display:false}} }
+    plugins: { 
+      legend: { 
+        labels:{
+          color:'#e2e8f0',
+          font: { size: 11 }
+        } 
+      },
+      tooltip: {
+        backgroundColor: 'rgba(15,17,23,0.95)',
+        titleColor: '#e2e8f0',
+        bodyColor: '#e2e8f0',
+        padding: 12,
+        cornerRadius: 8,
+      }
+    },
+    scales: { 
+      x:{
+        ticks:{color:'#64748b', font:{size:11}}, 
+        grid:{color:'#2e3347', drawBorder:false}
+      }, 
+      y:{
+        ticks:{color:'#64748b', font:{size:11}}, 
+        grid:{display:false}
+      } 
+    }
   });
 
   const jamLabels = Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}:00`);
@@ -572,16 +792,43 @@ async function loadDashboard() {
       label: 'Suara masuk',
       data: jamData,
       borderColor: '#4f8ef7',
-      backgroundColor: 'rgba(79,142,247,.15)',
+      backgroundColor: 'rgba(79,142,247,0.1)',
       fill: true,
       tension: 0.4,
-      pointRadius: 3,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      pointBackgroundColor: '#4f8ef7',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
     }]
   }, {
-    plugins: { legend:{display:false} },
+    plugins: { 
+      legend:{display:false},
+      tooltip: {
+        backgroundColor: 'rgba(15,17,23,0.95)',
+        titleColor: '#e2e8f0',
+        bodyColor: '#e2e8f0',
+        padding: 12,
+        cornerRadius: 8,
+        mode: 'index',
+        intersect: false,
+      }
+    },
     scales: {
-      x:{ticks:{color:'#64748b', maxTicksLimit:8}, grid:{color:'#2e3347'}},
-      y:{beginAtZero:true, ticks:{color:'#64748b'}, grid:{color:'#2e3347'}}
+      x:{
+        ticks:{color:'#64748b', font:{size:10}, maxTicksLimit:8}, 
+        grid:{color:'#2e3347', drawBorder:false}
+      },
+      y:{
+        beginAtZero:true, 
+        ticks:{color:'#64748b', font:{size:11}}, 
+        grid:{color:'#2e3347', drawBorder:false}
+      }
+    },
+    interaction: {
+      mode: 'nearest',
+      axis: 'x',
+      intersect: false
     }
   });
 }
@@ -592,7 +839,16 @@ function renderChart(id, type, chartData, opts) {
   charts[id] = new Chart(ctx, {
     type,
     data: chartData,
-    options: { responsive:true, maintainAspectRatio:false, color:'#e2e8f0', ...opts }
+    options: { 
+      responsive:true, 
+      maintainAspectRatio:false, 
+      color:'#e2e8f0',
+      animation: {
+        duration: 750,
+        easing: 'easeOutQuart'
+      },
+      ...opts 
+    }
   });
 }
 

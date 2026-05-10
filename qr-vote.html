@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Voting - OSIS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background:#f5f0e8;min-height:100vh;display:flex;flex-direction:column;align-items:center;max-width:480px;margin:0 auto;padding:20px}
+    
+    .header{text-align:center;padding:30px 0 20px;width:100%}
+    .header-title{font-family:'Playfair Display',serif;font-weight:900;font-size:36px;color:#1a1a2e;letter-spacing:3px}
+    .header-subtitle{font-size:12px;color:#666;margin-top:8px}
+    .header-deco{width:60px;height:3px;background:#1a1a2e;margin:15px auto;border-radius:2px}
+    
+    .info-card{background:#fff;border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,0.08)}
+    .info-card h3{font-size:14px;color:#1a1a2e;margin-bottom:10px}
+    .info-card p{font-size:12px;color:#666;line-height:1.6}
+    
+    .paslon-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;width:100%}
+    .qr-card{background:#fff;border-radius:15px;padding:20px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);transition:transform 0.3s ease}
+    .qr-card:hover{transform:translateY(-5px)}
+    .qr-card .paslon-num{background:#1a1a2e;color:#fff;font-size:10px;padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:12px}
+    .qr-card .paslon-name{font-size:11px;color:#333;margin-bottom:15px;font-weight:600;line-height:1.3}
+    .qr-image{width:140px;height:140px;margin:0 auto 12px;background:#f8f8f8;border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:center}
+    .qr-image img{width:100%;height:100%;object-fit:contain}
+    .qr-format{font-size:9px;color:#999;margin-top:8px}
+    
+    .btn-download{display:block;width:100%;padding:10px;background:#1a1a2e;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;margin-top:10px;transition:background 0.3s}
+    .btn-download:hover{background:#2a2a4e}
+    
+    .back-btn{position:fixed;bottom:20px;right:20px;width:50px;height:50px;background:#1a1a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(0,0,0,0.2);cursor:pointer;z-index:100}
+    .back-btn svg{width:24px;height:24px;fill:#fff}
+    
+    @media(max-width:400px){.paslon-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-title">🗳️ QR CODE VOTING</div>
+    <div class="header-subtitle">Scan untuk melakukan pemilihan</div>
+    <div class="header-deco"></div>
+  </div>
+  
+  <div class="info-card">
+    <h3>📋 Cara Penggunaan</h3>
+    <p>1. Panitia menunjukkan QR Code di bawah ini kepada siswa<br>
+       2. Siswa scan menggunakan menu "Scan" di aplikasi<br>
+       3. Siswa konfirmasi pilihan mereka<br>
+       4. Suara langsung tersimpan dan tidak dapat diubah</p>
+  </div>
+  
+  <div class="paslon-grid" id="paslon-grid">
+    <div class="info-card" style="grid-column:span 2;text-align:center">
+      <div style="padding:40px 20px;color:#999">
+        <div style="font-size:40px;margin-bottom:10px">⏳</div>
+        Memuat data paslon...
+      </div>
+    </div>
+  </div>
+  
+  <div class="back-btn" onclick="window.location.href='beranda.html'">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+  </div>
+  
+  <script src="source/js/api.js"></script>
+  <script>
+    // API endpoint untuk generate QR code (menggunakan API publik)
+    function generateQRCode(text) {
+      return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(text)}&color=1a1a2e&bgcolor=ffffff&margin=10`;
+    }
+    
+    async function loadPaslon() {
+      try {
+        const res = await fetch('/api/frontend/paslon.php');
+        const data = await res.json();
+        
+        if (!data.success || !data.data.paslon.length) {
+          document.getElementById('paslon-grid').innerHTML = `
+            <div class="info-card" style="grid-column:span 2;text-align:center">
+              <div style="padding:40px 20px;color:#999">
+                <div style="font-size:40px;margin-bottom:10px">📭</div>
+                Belum ada paslon yang terdaftar
+              </div>
+            </div>
+          `;
+          return;
+        }
+        
+        const grid = document.getElementById('paslon-grid');
+        grid.innerHTML = data.data.paslon.map(p => `
+          <div class="qr-card">
+            <span class="paslon-num">Paslon ${String(p.nomor_urut).padStart(2,'0')}</span>
+            <div class="paslon-name">${p.nama_ketua} & ${p.nama_wakil}</div>
+            <div class="qr-image">
+              <img src="${generateQRCode(`OSIS_VOTE:${p.id}`)}" alt="QR Code Paslon ${p.nomor_urut}">
+            </div>
+            <div class="qr-format">Format: OSIS_VOTE:${p.id}</div>
+            <button class="btn-download" onclick="downloadQR('${p.nama_ketua.replace(/'/g, "\\'")}', ${p.id})">
+              ⬇ Download QR
+            </button>
+          </div>
+        `).join('');
+        
+      } catch (err) {
+        console.error(err);
+        document.getElementById('paslon-grid').innerHTML = `
+          <div class="info-card" style="grid-column:span 2;text-align:center">
+            <div style="padding:40px 20px;color:#ef4444">
+              <div style="font-size:40px;margin-bottom:10px">❌</div>
+              Gagal memuat data paslon
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    function downloadQR(nama, paslonId) {
+      const qrUrl = generateQRCode(`OSIS_VOTE:${paslonId}`);
+      const link = document.createElement('a');
+      link.href = qrUrl;
+      link.download = `QR_Paslon_${nama.replace(/[^a-z0-9]/gi, '_')}.png`;
+      link.target = '_blank';
+      link.click();
+      
+      showToast(`QR Code untuk ${nama} siap didownload!`);
+    }
+    
+    loadPaslon();
+  </script>
+</body>
+</html>
